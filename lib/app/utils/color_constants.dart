@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF6F61E1); // The purple color from design
+  static const Color primary = Color(0xFF7B2FBE); // Atelier Purple
   static const Color secondary = Color(0xFF9E9E9E);
   static const Color background = Color(0xFFFBFBFE);
   static const Color cardColor = Color(0xFFFFFFFF);

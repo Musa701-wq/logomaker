@@ -8,4 +8,5 @@ class AppRoutes {
   static const String aiResult = '/ai-result';
   static const String about = '/about';
   static const String historyDetail = '/history-detail';
+  static const String templates = '/templates';
 }

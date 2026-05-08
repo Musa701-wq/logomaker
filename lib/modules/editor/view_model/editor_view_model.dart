@@ -32,6 +32,7 @@ class EditorViewModel extends GetxController {
   // Canvas State
   final components = <EditorElement>[].obs;
   final selectedIndex = (-1).obs;
+  final selectedFontCategory = 'All Styles'.obs;
   final aspectRatio = 1.0.obs;
 
   // Gesture State (Temporary variables for smooth scaling/rotation)
@@ -76,6 +77,7 @@ class EditorViewModel extends GetxController {
     'bgColor': backgroundColor.value,
     'bgGradient': backgroundGradient.value != null ? List<Color>.from(backgroundGradient.value!) : null,
     'aspectRatio': aspectRatio.value,
+    'selectedIndex': selectedIndex.value,
   };
 
   void _applySnapshot(Map<String, dynamic> s) {
@@ -83,7 +85,7 @@ class EditorViewModel extends GetxController {
     backgroundColor.value = s['bgColor'] as Color;
     backgroundGradient.value = s['bgGradient'] as List<Color>?;
     aspectRatio.value = s['aspectRatio'] as double;
-    selectedIndex.value = -1;
+    selectedIndex.value = s['selectedIndex'] as int? ?? -1;
   }
 
   void _pushHistory() {
@@ -116,17 +118,30 @@ class EditorViewModel extends GetxController {
   }
   
   // Background State
-  final backgroundColor = Colors.white.obs;
+  final backgroundColor = const Color(0xFF0B0D13).obs; // AppColors.premiumDark
   final backgroundGradient = Rx<List<Color>?>(null);
   
   final List<String> fonts = [
-    'Manrope', 'Inter', 'Playfair', 'Oswald', 
-    'Roboto', 'Lato', 'Montserrat', 'Poppins', 'Raleway', 'Nunito', 
-    'Ubuntu', 'Merriweather', 'Rubik', 'Lora', 'Anton', 'Bebas Neue', 
-    'Pacifico', 'Dancing Script', 'Caveat', 'Orbitron', 'Cinzel', 
-    'Righteous', 'Permanent Marker', 'Amatic SC'
+    // GAMING
+    'Press Start 2P', 'Orbitron', 'Russo One', 'Black Ops One', 'Michroma', 'Silkscreen', 'Chakra Petch', 'Wallpoet', 'Megrim', 'Saira Stencil One',
+    // EDITORIAL
+    'Bodoni Moda', 'Playfair Display', 'Prata', 'Cinzel', 'Cormorant Garamond', 'Libre Baskerville', 'Fraunces', 'Noto Serif', 'Libre Caslon Display', 'Spectral',
+    // MONO
+    'Space Mono', 'Fira Code', 'Source Code Pro', 'JetBrains Mono', 'Nova Mono', 'Ubuntu Mono', 'Roboto Mono', 'Anonymous Pro', 'Courier Prime',
+    // DISPLAY
+    'Monoton', 'Bungee', 'Alfa Slab One', 'Bangers', 'Faster One', 'Righteous', 'Permanent Marker', 'Lobster', 'Pacifico', 'Dancing Script', 'Caveat', 'Satisfy', 'Great Vibes',
+    // SANS
+    'Manrope', 'Inter', 'Roboto', 'Lato', 'Montserrat', 'Poppins', 'Raleway', 'Nunito', 'Josefin Sans', 'Space Grotesk',
   ];
-  
+
+  List<String> get filteredFonts {
+    if (selectedFontCategory.value == 'All Styles') return fonts;
+    if (selectedFontCategory.value == 'Gaming') return ['Press Start 2P', 'Orbitron', 'Russo One', 'Black Ops One', 'Michroma', 'Silkscreen', 'Chakra Petch', 'Wallpoet', 'Megrim', 'Saira Stencil One', 'Audiowide', 'Staatliches'];
+    if (selectedFontCategory.value == 'Editorial') return ['Bodoni Moda', 'Playfair Display', 'Prata', 'Cinzel', 'Cormorant Garamond', 'Libre Baskerville', 'Abril Fatface', 'Crimson Text', 'Fraunces', 'Cardo', 'Noto Serif', 'Libre Caslon Display', 'Spectral'];
+    if (selectedFontCategory.value == 'Monospace') return ['Space Mono', 'Fira Code', 'Source Code Pro', 'JetBrains Mono', 'Nova Mono', 'Ubuntu Mono', 'Inconsolata', 'Major Mono Display', 'Roboto Mono', 'Anonymous Pro', 'Courier Prime'];
+    return fonts;
+  }
+
   final List<Map<String, dynamic>> ratios = [
     {'name': 'Square', 'ratio': 1.0, 'icon': Icons.crop_square},
     {'name': 'Story', 'ratio': 9/16, 'icon': Icons.stay_current_portrait},
@@ -140,6 +155,8 @@ class EditorViewModel extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Shuffle fonts to show variety at the top
+    fonts.shuffle();
 
     // When text editing ends, return to the TEXT sub-panel automatically
     ever(isEditingText, (bool editing) {
@@ -223,7 +240,7 @@ class EditorViewModel extends GetxController {
       position: const Offset(100, 100),
       content: 'Tap to edit',
       fontSize: 32,
-      color: Colors.black,
+      color: Colors.white,
       fontFamily: 'Manrope',
       fontWeight: FontWeight.bold,
     );
@@ -309,9 +326,15 @@ class EditorViewModel extends GetxController {
     }
   }
 
-  // Called when slider drag ends — saves current state as one undo point
-  void commitSliderHistory() {
+  // Called when slider drag begins — saves state before change
+  void startSliderChange() {
     _pushHistory();
+  }
+
+  // Called when slider drag ends
+  void commitSliderHistory() {
+    // We already save at start, but we can keep this for other non-start based updates if needed
+    // For now, we'll rely on startSliderChange for undo consistency
   }
 
   void removeSelected() {

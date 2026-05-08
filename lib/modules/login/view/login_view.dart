@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/custom_button.dart';
-import '../../../widgets/custom_text_field.dart';
-import '../../../app/utils/color_constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../view_model/login_view_model.dart';
 
 class LoginView extends GetView<LoginViewModel> {
@@ -13,269 +11,253 @@ class LoginView extends GetView<LoginViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 40.h),
-              
-              // Logo and App Name
-              Row(
-                children: [
-                  Container(
-                    width: 40.w,
-                    height: 40.w,
-                    decoration: BoxDecoration(
-                      color: AppColors.atelierDark,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.asset(
-                        'assets/images/logo1.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+      backgroundColor: const Color(0xFF0B0D13),
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 420.h,
+            child: ClipPath(
+              clipper: CustomHeaderClipper(),
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF7B2FBE),
+                      Color(0xFF9D4EDD),
+                      Color(0xFF240046),
+                    ],
                   ),
-                  SizedBox(width: 12.w),
-                  Text(
-                    'The Ethereal Studio',
-                    style: GoogleFonts.inter(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.atelierDark,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 60.h),
-
-              // Login Card
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 32.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(32.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    SizedBox(height: 40.h),
                     Text(
-                      'Welcome Back',
-                      style: GoogleFonts.inter(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.atelierDark,
+                      'Atelier',
+                      style: GoogleFonts.dancingScript(
+                        fontSize: 64.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.4),
+                            offset: const Offset(0, 4),
+                            blurRadius: 15,
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 8.h),
-                    Text(
-                      'Sign in to your creative suite.',
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        color: AppColors.textSecondary,
+                    Container(
+                      width: 50.w,
+                      height: 3.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                  ],
+                ),
+              ),
+            ),
+          ),
 
-                    // Email Field
-                    CustomTextField(
-                      label: 'Email Address',
-                      hintText: 'name@studio.com',
-                      controller: controller.emailController,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    SizedBox(height: 24.h),
+          // Dismiss (Close) Button
+          Positioned(
+            top: 40.h,
+            right: 20.w,
+            child: GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+              ),
+            ),
+          ),
 
-                    // Password Field
-                    Column(
+          // Main Content
+          SafeArea(
+            child: Column(
+              children: [
+                SizedBox(height: 400.h),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40.w),
+                    child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Password',
-                              style: GoogleFonts.inter(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.atelierDark,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: Text(
-                                'Forgot Password?',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF00897B), // Teal from design
-                                ),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'Welcome back',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 34.sp,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                          ),
                         ),
                         SizedBox(height: 8.h),
-                        Obx(() => TextField(
-                          controller: controller.passwordController,
-                          obscureText: !controller.isPasswordVisible.value,
-                          style: GoogleFonts.inter(
+                        Text(
+                          'Login to continue your creative journey',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.outfit(
                             fontSize: 15.sp,
-                            color: AppColors.atelierDark,
+                            color: Colors.white38,
+                            fontWeight: FontWeight.w400,
                           ),
-                          decoration: InputDecoration(
-                            hintText: '........',
-                            hintStyle: GoogleFonts.inter(
-                              color: AppColors.textSecondary.withOpacity(0.5),
-                              fontSize: 15.sp,
+                        ),
+                        const Spacer(),
+                        Obx(() => GestureDetector(
+                          onTap: controller.isLoading.value ? null : () => controller.loginWithGoogle(),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: double.infinity,
+                            height: 60.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF7B2FBE).withOpacity(0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
                             ),
-                            filled: true,
-                            fillColor: AppColors.atelierFieldBg.withOpacity(0.4),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                controller.isPasswordVisible.value 
-                                  ? Icons.visibility_off_outlined 
-                                  : Icons.visibility_outlined,
-                                size: 20.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                              onPressed: controller.togglePasswordVisibility,
+                            child: Center(
+                              child: controller.isLoading.value
+                                  ? SizedBox(
+                                      width: 24.w,
+                                      height: 24.w,
+                                      child: const CircularProgressIndicator(
+                                        color: Color(0xFF0B0D13),
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.g_mobiledata_rounded, color: const Color(0xFF4285F4), size: 40.sp),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          'Continue with Google',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 17.sp,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF0B0D13),
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                              borderSide: BorderSide(color: AppColors.atelierFieldBg),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
                           ),
                         )),
-                      ],
-                    ),
-
-                    SizedBox(height: 32.h),
-
-                    // Sign In Button
-                    Obx(() => CustomButton(
-                      text: 'Sign In',
-                      isLoading: controller.isLoading.value,
-                      onPressed: controller.login,
-                      icon: Icon(Icons.arrow_forward, color: Colors.tealAccent, size: 20.sp),
-                    )),
-
-                    SizedBox(height: 32.h),
-
-                    // Divider
-                    Row(
-                      children: [
-                        const Expanded(child: Divider(color: AppColors.dividerColor)),
+                        const Spacer(),
+                        // Terms and Policies Footer
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: Text(
-                            'OR CONTINUE WITH',
-                            style: GoogleFonts.inter(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                              color: AppColors.textSecondary,
+                          padding: EdgeInsets.only(bottom: 20.h),
+                          child: Text.rich(
+                            TextSpan(
+                              text: 'By continuing, you agree to our ',
+                              style: GoogleFonts.outfit(
+                                fontSize: 12.sp,
+                                color: Colors.white24,
+                                height: 1.5,
+                              ),
+                              children: [
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final url = Uri.parse('https://logomaker-6d294.web.app/terms.html');
+                                      try {
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      } catch (e) {
+                                        print('Could not launch Terms: $e');
+                                      }
+                                    },
+                                    child: Text(
+                                      'Terms of Service',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 12.sp,
+                                        color: const Color(0xFF9D4EDD),
+                                        fontWeight: FontWeight.w800,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const TextSpan(text: ' and '),
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final url = Uri.parse('https://logomaker-6d294.web.app/privacy.html');
+                                      try {
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      } catch (e) {
+                                        print('Could not launch Privacy: $e');
+                                      }
+                                    },
+                                    child: Text(
+                                      'Privacy Policy',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 12.sp,
+                                        color: const Color(0xFF9D4EDD),
+                                        fontWeight: FontWeight.w800,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                        const Expanded(child: Divider(color: AppColors.dividerColor)),
-                      ],
-                    ),
-
-                    SizedBox(height: 32.h),
-
-                    // Social Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomButton(
-                            text: 'Google',
-                            isSecondary: true,
-                            onPressed: controller.loginWithGoogle,
-                            icon: Icon(Icons.g_mobiledata, size: 24.sp),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 32.h),
-
-              // Bottom Links
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Sign Up',
-                        style: GoogleFonts.inter(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF00897B),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 40.h),
-
-              // Footer
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40.w),
-                  child: Text(
-                    '© 2024 Atelier Studio. Crafted for creators. Secure & Private.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 11.sp,
-                      color: AppColors.textSecondary.withOpacity(0.6),
                     ),
                   ),
                 ),
-              ),
-              
-              SizedBox(height: 24.h),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
+
+class CustomHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 80);
+    var firstControlPoint = Offset(size.width / 4, size.height);
+    var firstEndPoint = Offset(size.width / 2, size.height);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy, firstEndPoint.dx, firstEndPoint.dy);
+    var secondControlPoint = Offset(size.width * 3 / 4, size.height);
+    var secondEndPoint = Offset(size.width, size.height - 80);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy, secondEndPoint.dx, secondEndPoint.dy);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

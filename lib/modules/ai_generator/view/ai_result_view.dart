@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -5,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../app/utils/color_constants.dart';
 import '../../../widgets/custom_button.dart';
+import '../../templates/view_model/templates_view_model.dart';
 import '../view_model/ai_generator_view_model.dart';
 
 class AIResultView extends GetView<AIGeneratorViewModel> {
@@ -13,17 +15,17 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.premiumDark,
       appBar: AppBar(
         title: Text(
           'Generation Result',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon: Icon(Icons.close_rounded, color: Colors.white, size: 24.sp),
           onPressed: () => Get.offAllNamed(AppRoutes.home),
         ),
       ),
@@ -33,10 +35,8 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
           children: [
             _buildResultCard(),
             SizedBox(height: 40.h),
-            
             _buildActionSection(),
             SizedBox(height: 32.h),
-            
             _buildSuccessMessage(),
           ],
         ),
@@ -45,100 +45,97 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
   }
 
   Widget _buildResultCard() {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 380.h,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(40.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.1),
-                blurRadius: 40,
-                offset: const Offset(0, 20),
-              ),
-            ],
+    return Container(
+      width: double.infinity,
+      height: 380.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1D25),
+        borderRadius: BorderRadius.circular(40.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.1),
+            blurRadius: 40,
+            offset: const Offset(0, 20),
           ),
-          child: Stack(
-            children: [
-              // Grid Background
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.03,
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10),
-                    itemBuilder: (context, index) => Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black.withOpacity(0.05)),
-                      ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Grid Background
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.05,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10),
+                itemBuilder: (context, index) => Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
+          // Result SVG
+          Center(
+            child: Container(
+              width: 250.w,
+              height: 250.w,
+              padding: EdgeInsets.all(20.w),
+              decoration: BoxDecoration(
+                color: Colors.white, // White background for the logo itself looks better
+                borderRadius: BorderRadius.circular(30.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30.r),
+                child: Obx(() => controller.generatedLogoSvg.value.isNotEmpty
+                  ? SvgPicture.string(
+                      controller.generatedLogoSvg.value,
+                      fit: BoxFit.contain,
+                    )
+                  : const Center(child: CircularProgressIndicator())),
+              ),
+            ),
+          ),
+          
+          // Badge
+          Positioned(
+            top: 24.h,
+            right: 24.w,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [AppColors.primary, AppColors.accentPurple]),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.white, size: 14.sp),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'AI GENERATED',
+                    style: GoogleFonts.outfit(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1,
                     ),
                   ),
-                ),
+                ],
               ),
-              
-              // Result Image
-              Center(
-                child: Container(
-                  width: 250.w,
-                  height: 250.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30.r),
-                    child: Image.asset(
-                      'assets/images/testing_logo.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                         return Image.asset('assets/images/logo1.jpg', fit: BoxFit.cover);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Badge
-              Positioned(
-                top: 24.h,
-                right: 24.w,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check_circle_rounded, color: Colors.white, size: 14.sp),
-                      SizedBox(width: 6.w),
-                      Text(
-                        'AI GENERATED',
-                        style: GoogleFonts.outfit(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -150,7 +147,26 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
           onPressed: controller.saveToGallery,
           icon: Icon(Icons.download_rounded, color: Colors.white, size: 20.sp),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 12.h),
+        CustomButton(
+          text: 'ADD TO TEMPLATES',
+          onPressed: () {
+            // Get the templates view model and add the logo
+            try {
+              final templatesVM = Get.find<TemplatesViewModel>();
+              templatesVM.addLogoToTemplates(
+                controller.brandNameController.text.isNotEmpty 
+                  ? controller.brandNameController.text 
+                  : 'AI Logo',
+                'assets/images/logo2.jpg' // Using generated image
+              );
+            } catch (e) {
+              Get.snackbar('Error', 'Templates module not initialized');
+            }
+          },
+          icon: Icon(Icons.auto_fix_high_rounded, color: Colors.white, size: 20.sp),
+        ),
+        SizedBox(height: 12.h),
         CustomButton(
           text: 'SHARE DESIGN',
           isSecondary: true,
@@ -169,7 +185,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
           style: GoogleFonts.outfit(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Colors.white,
           ),
         ),
         SizedBox(height: 8.h),
@@ -178,9 +194,9 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
           child: Text(
             'This unique asset has been crafted using the Atelier Gen-01 engine based on your creative prompt.',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: 13.sp,
-              color: AppColors.textSecondary,
+              color: Colors.white38,
               height: 1.5,
             ),
           ),

@@ -33,7 +33,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                   style: GoogleFonts.outfit(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: Colors.white,
                   ),
                 ),
                 const Spacer(),
@@ -69,7 +69,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                         style: GoogleFonts.outfit(
                           fontSize: 40.sp,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                       ),
                       TextSpan(
@@ -110,7 +110,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                     child: Column(children: [
                       Icon(Icons.history_rounded, color: Colors.grey[300], size: 60.sp),
                       SizedBox(height: 16.h),
-                      Text('No designs yet', style: GoogleFonts.outfit(fontSize: 18.sp, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      Text('No designs yet', style: GoogleFonts.outfit(fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white38)),
                       SizedBox(height: 8.h),
                       Text('Your saved designs will appear here', style: GoogleFonts.outfit(fontSize: 14.sp, color: AppColors.textSecondary)),
                     ]),
@@ -149,11 +149,11 @@ class HistoryView extends GetView<HistoryViewModel> {
           // Card
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardDark,
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withOpacity(0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -168,7 +168,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                   child: Container(
                     height: isTall ? 240.h : 180.h,
                     width: double.infinity,
-                    color: Colors.grey[100],
+                    color: const Color(0xFF2B2E7A),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -216,7 +216,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                               style: GoogleFonts.outfit(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                                color: Colors.white,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

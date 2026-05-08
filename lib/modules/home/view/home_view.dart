@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import '../../../app/utils/color_constants.dart';
 import '../view_model/home_view_model.dart';
 import '../../history/view/history_view.dart';
 import '../../profile/view/profile_view.dart';
+import '../../credits/view/credits_view.dart';
 import '../../../app/routes/app_routes.dart';
 
 class HomeView extends GetView<HomeViewModel> {
@@ -14,13 +16,13 @@ class HomeView extends GetView<HomeViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.premiumDark,
+      backgroundColor: const Color(0xFF0B0D13),
       body: SafeArea(
         child: Obx(() {
           switch (controller.selectedIndex.value) {
             case 0: return _buildHomeBody();
             case 1: return const HistoryView();
-            case 2: return _buildProjectsBody();
+            case 2: return const CreditsView();
             case 3: return const ProfileView();
             default: return _buildHomeBody();
           }
@@ -28,11 +30,14 @@ class HomeView extends GetView<HomeViewModel> {
       ),
       bottomNavigationBar: _buildBottomNav(),
       floatingActionButton: Obx(() => controller.selectedIndex.value == 0
-          ? FloatingActionButton(
-              onPressed: () => Get.toNamed(AppRoutes.editor),
-              backgroundColor: AppColors.accentPurpleBtn,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
-              child: Icon(Icons.add, color: Colors.white, size: 28.sp),
+          ? Padding(
+              padding: EdgeInsets.only(bottom: 20.h),
+              child: FloatingActionButton(
+                onPressed: () => controller.onCreateNewLogo(),
+                backgroundColor: const Color(0xFF7B2FBE),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
+                child: Icon(Icons.add, color: Colors.white, size: 28.sp),
+              ),
             )
           : const SizedBox.shrink()),
     );
@@ -97,24 +102,44 @@ class HomeView extends GetView<HomeViewModel> {
           Container(
             width: 36.w, height: 36.w,
             decoration: BoxDecoration(
-              color: AppColors.accentPurpleBtn.withOpacity(0.2),
+              color: const Color(0xFF7B2FBE).withOpacity(0.2),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(Icons.auto_awesome, color: AppColors.accentPurpleBtn, size: 18.sp),
+            child: Icon(Icons.auto_awesome, color: const Color(0xFF7B2FBE), size: 18.sp),
           ),
           SizedBox(width: 10.w),
           Text('Luminous', style: GoogleFonts.outfit(
-            color: AppColors.accentPurpleBtn, fontSize: 20.sp, fontWeight: FontWeight.bold,
+            color: const Color(0xFF7B2FBE), fontSize: 20.sp, fontWeight: FontWeight.bold,
           )),
           const Spacer(),
-          Container(
-            width: 38.w, height: 38.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.accentPurpleBtn, width: 2),
-              image: const DecorationImage(image: AssetImage('assets/images/logo1.jpg'), fit: BoxFit.cover),
-            ),
-          ),
+          Obx(() => controller.isGuest.value 
+            ? GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.login),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7B2FBE).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(color: const Color(0xFF7B2FBE).withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    'LOGIN',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFF7B2FBE),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+            : Container(
+                width: 38.w, height: 38.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFF7B2FBE), width: 2),
+                  image: const DecorationImage(image: AssetImage('assets/images/logo1.jpg'), fit: BoxFit.cover),
+                ),
+              )),
         ],
       ),
     );
@@ -130,7 +155,7 @@ class HomeView extends GetView<HomeViewModel> {
           end: Alignment.bottomRight,
           colors: [Color(0xFF1A1040), Color(0xFF0F1628)],
         ),
-        border: Border.all(color: AppColors.accentPurpleBtn.withOpacity(0.2)),
+        border: Border.all(color: const Color(0xFF7B2FBE).withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,16 +177,13 @@ class HomeView extends GetView<HomeViewModel> {
           ),
           SizedBox(height: 20.h),
           GestureDetector(
-            onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
-              'templateImage': 'assets/images/logo.png',
-              'templateText': 'Esport',
-            }),
+            onTap: () => controller.onCreateNewLogo(),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
               decoration: BoxDecoration(
-                color: AppColors.accentPurpleBtn,
+                color: const Color(0xFF7B2FBE),
                 borderRadius: BorderRadius.circular(14.r),
-                boxShadow: [BoxShadow(color: AppColors.accentPurpleBtn.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 6))],
+                boxShadow: [BoxShadow(color: const Color(0xFF7B2FBE).withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 6))],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -193,7 +215,10 @@ class HomeView extends GetView<HomeViewModel> {
               Text('Select a style to begin your creative journey', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12.sp)),
             ],
           ),
-          Text('VIEW ALL', style: GoogleFonts.outfit(color: AppColors.accentPurpleBtn, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+          GestureDetector(
+            onTap: () => Get.toNamed(AppRoutes.templates),
+            child: Text('VIEW ALL', style: GoogleFonts.outfit(color: const Color(0xFF7B2FBE), fontSize: 11.sp, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );
@@ -213,9 +238,9 @@ class HomeView extends GetView<HomeViewModel> {
               margin: EdgeInsets.only(right: 10.w),
               padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: isSel ? AppColors.accentPurpleBtn : AppColors.cardDark,
+                color: isSel ? const Color(0xFF7B2FBE) : const Color(0xFF1A1D25),
                 borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: isSel ? AppColors.accentPurpleBtn : Colors.white12),
+                border: Border.all(color: isSel ? const Color(0xFF7B2FBE) : Colors.white12),
               ),
               child: Text(cat, style: GoogleFonts.outfit(
                 color: isSel ? Colors.white : Colors.white54,
@@ -247,7 +272,7 @@ class HomeView extends GetView<HomeViewModel> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.cardDark,
+                color: const Color(0xFF2B2E7A),
                 borderRadius: BorderRadius.circular(18.r),
                 border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
@@ -290,57 +315,25 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
-  // ── PROJECTS BODY ──
-  Widget _buildProjectsBody() {
-    return Center(child: Text('Projects', style: GoogleFonts.outfit(color: Colors.white, fontSize: 20.sp)));
-  }
 
   // ── BOTTOM NAV ──
   Widget _buildBottomNav() {
-    final items = [
-      {'icon': Icons.brush_outlined, 'filledIcon': Icons.brush_rounded, 'label': 'STUDIO'},
-      {'icon': Icons.grid_view_outlined, 'filledIcon': Icons.grid_view_rounded, 'label': 'TEMPLATES'},
-      {'icon': Icons.folder_outlined, 'filledIcon': Icons.folder_rounded, 'label': 'PROJECTS'},
-      {'icon': Icons.settings_outlined, 'filledIcon': Icons.settings_rounded, 'label': 'SETTINGS'},
-    ];
-    return Container(
-      height: 72.h,
-      decoration: BoxDecoration(
-        color: AppColors.panelDark,
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.06))),
-      ),
-      child: Obx(() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(items.length, (i) {
-          final isSel = controller.selectedIndex.value == i;
-          return GestureDetector(
-            onTap: () => controller.changeIndex(i),
-            behavior: HitTestBehavior.opaque,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: isSel ? AppColors.accentPurpleBtn.withOpacity(0.2) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Icon(
-                    isSel ? (items[i]['filledIcon'] as IconData) : (items[i]['icon'] as IconData),
-                    color: isSel ? AppColors.accentPurpleBtn : Colors.white38,
-                    size: 22.sp,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(items[i]['label'] as String, style: GoogleFonts.outfit(
-                  color: isSel ? AppColors.accentPurpleBtn : Colors.white38,
-                  fontSize: 9.sp, fontWeight: isSel ? FontWeight.bold : FontWeight.w500,
-                )),
-              ],
-            ),
-          );
-        }),
-      )),
-    );
+    return Obx(() => CurvedNavigationBar(
+      backgroundColor: const Color(0xFF0B0D13), // Match Scaffold background
+      color: const Color(0xFF1A1D25),
+      buttonBackgroundColor: const Color(0xFF7B2FBE),
+      height: 60,
+      animationDuration: const Duration(milliseconds: 300),
+      items: const <Widget>[
+        Icon(Icons.brush_rounded, size: 30, color: Colors.white),
+        Icon(Icons.grid_view_rounded, size: 30, color: Colors.white),
+        Icon(Icons.account_balance_wallet_rounded, size: 30, color: Colors.white),
+        Icon(Icons.person_rounded, size: 30, color: Colors.white),
+      ],
+      index: controller.selectedIndex.value,
+      onTap: (index) {
+        controller.changeIndex(index);
+      },
+    ));
   }
 }

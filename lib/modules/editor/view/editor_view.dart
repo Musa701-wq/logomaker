@@ -27,60 +27,84 @@ class DottedBackgroundPainter extends CustomPainter {
 
 class _CustomShapeClipper extends CustomClipper<Path> {
   final String shapeType;
-  _CustomShapeClipper(this.shapeType);
+  final double borderRadius;
+  _CustomShapeClipper(this.shapeType, {this.borderRadius = 0});
 
   @override
   Path getClip(Size size) {
-    Path path = Path();
     double w = size.width;
     double h = size.height;
+    double r = borderRadius.clamp(0, (w < h ? w : h) / 4);
 
     switch (shapeType) {
       case 'triangle':
-        path.moveTo(w / 2, 0);
-        path.lineTo(w, h);
-        path.lineTo(0, h);
-        path.close();
-        break;
+        return _roundedPolygon([Offset(w / 2, 0), Offset(w, h), Offset(0, h)], r);
       case 'star':
-        path.moveTo(w / 2, 0);
-        path.lineTo(w * 0.61, h * 0.35);
-        path.lineTo(w * 0.98, h * 0.35);
-        path.lineTo(w * 0.68, h * 0.57);
-        path.lineTo(w * 0.79, h * 0.91);
-        path.lineTo(w / 2, h * 0.70);
-        path.lineTo(w * 0.21, h * 0.91);
-        path.lineTo(w * 0.32, h * 0.57);
-        path.lineTo(w * 0.02, h * 0.35);
-        path.lineTo(w * 0.39, h * 0.35);
-        path.close();
-        break;
+        return _roundedPolygon([
+          Offset(w / 2, 0), Offset(w * 0.61, h * 0.35), Offset(w * 0.98, h * 0.35),
+          Offset(w * 0.68, h * 0.57), Offset(w * 0.79, h * 0.91), Offset(w / 2, h * 0.70),
+          Offset(w * 0.21, h * 0.91), Offset(w * 0.32, h * 0.57), Offset(w * 0.02, h * 0.35),
+          Offset(w * 0.39, h * 0.35),
+        ], r);
       case 'hexagon':
-        path.moveTo(w * 0.25, 0);
-        path.lineTo(w * 0.75, 0);
-        path.lineTo(w, h * 0.5);
-        path.lineTo(w * 0.75, h);
-        path.lineTo(w * 0.25, h);
-        path.lineTo(0, h * 0.5);
-        path.close();
-        break;
+        return _roundedPolygon([
+          Offset(w * 0.25, 0), Offset(w * 0.75, 0), Offset(w, h * 0.5),
+          Offset(w * 0.75, h), Offset(w * 0.25, h), Offset(0, h * 0.5),
+        ], r);
       case 'pentagon':
-        path.moveTo(w / 2, 0);
-        path.lineTo(w, h * 0.38);
-        path.lineTo(w * 0.82, h);
-        path.lineTo(w * 0.18, h);
-        path.lineTo(0, h * 0.38);
-        path.close();
-        break;
+        return _roundedPolygon([
+          Offset(w / 2, 0), Offset(w, h * 0.38), Offset(w * 0.82, h),
+          Offset(w * 0.18, h), Offset(0, h * 0.38),
+        ], r);
       case 'heart':
+        Path path = Path();
         path.moveTo(w / 2, h / 4);
         path.cubicTo(w / 4, 0, 0, h / 4, w / 2, h);
         path.moveTo(w / 2, h / 4);
         path.cubicTo(w * 3 / 4, 0, w, h / 4, w / 2, h);
-        break;
+        return path;
       default:
+        Path path = Path();
         path.addRect(Rect.fromLTWH(0, 0, w, h));
+        return path;
     }
+  }
+
+  Path _roundedPolygon(List<Offset> points, double radius) {
+    final path = Path();
+    if (points.isEmpty) return path;
+    if (radius <= 0) {
+      path.addPolygon(points, true);
+      return path;
+    }
+
+    for (int i = 0; i < points.length; i++) {
+      Offset p1 = points[i == 0 ? points.length - 1 : i - 1];
+      Offset p2 = points[i];
+      Offset p3 = points[(i + 1) % points.length];
+
+      // Vector from p2 to p1 and p2 to p3
+      Offset v1 = p1 - p2;
+      Offset v2 = p3 - p2;
+      
+      // Normalize and scale by radius
+      double d1 = v1.distance;
+      double d2 = v2.distance;
+      double r = radius.clamp(0, (d1 < d2 ? d1 : d2) / 2);
+      
+      Offset start = p2 + (v1 / d1) * r;
+      Offset end = p2 + (v2 / d2) * r;
+
+      if (i == 0) {
+        path.moveTo(start.dx, start.dy);
+      } else {
+        path.lineTo(start.dx, start.dy);
+      }
+      
+      // Arc/Curve through the corner
+      path.quadraticBezierTo(p2.dx, p2.dy, end.dx, end.dy);
+    }
+    path.close();
     return path;
   }
 
@@ -95,7 +119,7 @@ class EditorView extends GetView<EditorViewModel> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.premiumDark,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false, // Prevent UI jumping when keyboard opens
       body: SafeArea(
         child: Column(
           children: [
@@ -105,14 +129,14 @@ class EditorView extends GetView<EditorViewModel> {
                 final isEditing = controller.isEditingText.value;
                 return Stack(
                   children: [
-                    // Canvas - always visible, positioned at top
-                    Positioned(
-                      top: 0, left: 0, right: 0,
-                      bottom: isEditing ? 0 : null,
-                      child: _buildCanvasArea(),
-                    ),
+                    // Canvas - always visible
+                    Positioned.fill(child: _buildCanvasArea()),
+                    
                     // Bottom panel - hidden when keyboard is open
-                    if (!isEditing) _buildContextualBottomPanel(),
+                    if (!isEditing) 
+                      Positioned.fill(
+                        child: _buildContextualBottomPanel(),
+                      ),
                   ],
                 );
               }),
@@ -316,7 +340,13 @@ class EditorView extends GetView<EditorViewModel> {
 
   Widget _buildElementContent(int index, EditorElement element) {
     if (element.type == ElementType.text) {
-      if (controller.isEditingText.value && controller.selectedIndex.value == index) {
+      final isEditing = controller.isEditingText.value && controller.selectedIndex.value == index;
+      
+      if (isEditing) {
+        // Styled Editor - use element's properties for the input field
+        final double realSize = (element.fontSize ?? 24).sp * element.scale;
+        final Color textColor = element.shapeGradient != null ? element.shapeGradient!.first : (element.color ?? Colors.white);
+        
         return IntrinsicWidth(
           child: TextFormField(
             initialValue: element.content,
@@ -325,15 +355,21 @@ class EditorView extends GetView<EditorViewModel> {
             onChanged: (v) => controller.updateSelectedElement((e) => e.copyWith(content: v)),
             onFieldSubmitted: (_) => controller.isEditingText.value = false,
             onTapOutside: (_) => controller.isEditingText.value = false,
-            cursorColor: Colors.white,
+            cursorColor: AppColors.accentPurpleBtn,
             style: _getFont(element.fontFamily ?? 'Manrope').copyWith(
-              fontSize: (element.fontSize ?? 24).sp * element.scale,
-              color: element.color ?? Colors.white,
+              fontSize: realSize,
+              color: textColor,
               fontWeight: element.fontWeight,
               letterSpacing: element.letterSpacing,
               height: element.lineHeight,
+              // Add shadow if present to maintain 'styled' look
+              shadows: element.glowRadius > 0 ? [Shadow(color: element.glowColor, blurRadius: element.glowRadius)] : null,
             ),
-            decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true,
+            ),
           ),
         );
       }
@@ -413,7 +449,7 @@ class EditorView extends GetView<EditorViewModel> {
 
       if (isCustomShape) {
         shapeContent = ClipPath(
-          clipper: _CustomShapeClipper(element.content),
+          clipper: _CustomShapeClipper(element.content, borderRadius: element.borderRadius),
           child: shapeContent,
         );
       }
@@ -424,6 +460,8 @@ class EditorView extends GetView<EditorViewModel> {
 
   Widget _buildTextElement(EditorElement element) {
     double realSize = (element.fontSize ?? 24).sp * element.scale;
+    // Add extra padding for thick outlines so they don't get clipped
+    final double outlinePadding = element.outlineWidth + (element.glowRadius / 2);
 
     final List<Shadow> shadows = [
       if (element.glowRadius > 0) ...[
@@ -466,6 +504,12 @@ class EditorView extends GetView<EditorViewModel> {
       textWidget = buildText();
     }
 
+    // Apply padding for thick outlines and descenders BEFORE gradient/curve
+    textWidget = Padding(
+      padding: EdgeInsets.all(outlinePadding + 15), 
+      child: textWidget,
+    );
+
     // Apply gradient via ShaderMask if shapeGradient is set
     if (element.shapeGradient != null) {
       textWidget = ShaderMask(
@@ -491,7 +535,10 @@ class EditorView extends GetView<EditorViewModel> {
       );
     }
 
-    return Opacity(opacity: element.opacity, child: textWidget);
+    return Opacity(
+      opacity: element.opacity, 
+      child: textWidget,
+    );
   }
 
   Widget _buildContextualBottomPanel() {
@@ -614,15 +661,15 @@ class EditorView extends GetView<EditorViewModel> {
         _lbl('SIZE  •  ${(e.fontSize ?? 24).toInt()}px'), _sld((e.fontSize ?? 24).toDouble(), 8, 200, (v) => controller.updateSelectedElement((x) => x.copyWith(fontSize: v), saveHistory: false)), _sp(4),
         _lbl('WEIGHT'),
         SizedBox(height: 34.h, child: ListView(scrollDirection: Axis.horizontal, children: [
-          _wchip('Thin', FontWeight.w100, e), _wchip('Light', FontWeight.w300, e), _wchip('Regular', FontWeight.w400, e),
-          _wchip('Medium', FontWeight.w500, e), _wchip('Bold', FontWeight.w700, e), _wchip('Black', FontWeight.w900, e),
+          _wchip('Light', FontWeight.w300, e),
+          _wchip('Regular', FontWeight.w400, e),
+          _wchip('Bold', FontWeight.w700, e),
+          _wchip('Heavy', FontWeight.w900, e),
         ])),
         _sp(8),
         _lbl('LETTER SPACING  •  ${e.letterSpacing.toStringAsFixed(1)}'), _sld(e.letterSpacing, -5, 20, (v) => controller.updateSelectedElement((x) => x.copyWith(letterSpacing: v), saveHistory: false)), _sp(4),
         _lbl('STROKE WIDTH  •  ${e.outlineWidth.toStringAsFixed(1)}pt'), _sld(e.outlineWidth, 0, 20, (v) => controller.updateSelectedElement((x) => x.copyWith(outlineWidth: v), saveHistory: false)),
         _sp(4), _lbl('STROKE COLOR'), _clrRow(e.outlineColor, (c) => controller.updateSelectedElement((x) => x.copyWith(outlineColor: c))), _sp(10),
-        _lbl('3D TILT X  •  ${e.rotateX.toStringAsFixed(2)}'), _sld(e.rotateX, -1, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(rotateX: v), saveHistory: false)), _sp(2),
-        _lbl('3D TILT Y  •  ${e.rotateY.toStringAsFixed(2)}'), _sld(e.rotateY, -1, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(rotateY: v), saveHistory: false)), _sp(10),
         _lbl('CURVE  •  ${e.curveAngle.toStringAsFixed(2)}'), _sld(e.curveAngle, -1, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(curveAngle: v), saveHistory: false)), _sp(10),
         _actRow(),
       ],
@@ -650,113 +697,107 @@ class EditorView extends GetView<EditorViewModel> {
   Widget _buildColorsPanel() {
     return Obx(() {
       final idx = controller.selectedIndex.value;
-      final hasSel = idx != -1;
+      final hasSel = idx != -1 && idx < controller.components.length;
       final e = hasSel ? controller.components[idx] : null;
-      final isGradientTab = controller.colorTab.value == 'GRADIENT';
+      final isImage = e?.type == ElementType.image;
+      final activeTab = controller.colorTab.value;
 
-    return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      _phdr('Colors', undo: controller.undo, redo: controller.redo),
-      if (!hasSel) _empty('Select an element to change its color', Icons.color_lens_outlined)
-      else ...[
-        // SOLID / GRADIENT tabs
-        Container(
-          padding: EdgeInsets.all(4.w),
-          decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
-          child: Row(children: ['SOLID', 'GRADIENT'].map((tab) {
-            final sel = controller.colorTab.value == tab;
-            return Expanded(child: GestureDetector(
-              onTap: () => controller.colorTab.value = tab,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: sel ? AppColors.accentPurpleBtn : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10.r),
+      return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+        _phdr('Colors', undo: controller.undo, redo: controller.redo),
+        if (!hasSel)
+          _empty('Select an element to change its color', Icons.color_lens_outlined)
+        else if (isImage)
+          _empty('Colors cannot be applied to images.\nUse "EFFECTS" tab for image filters.', Icons.image_not_supported_rounded)
+        else ...[
+          // ── SOLID / GRADIENT tab switcher ──
+          Container(
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
+            child: Row(children: ['SOLID', 'GRADIENT'].map((tab) {
+              final sel = activeTab == tab;
+              return Expanded(child: GestureDetector(
+                onTap: () => controller.colorTab.value = tab,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: sel ? AppColors.accentPurpleBtn : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Center(child: Text(tab, style: GoogleFonts.outfit(
+                    color: sel ? Colors.black : Colors.white54,
+                    fontWeight: FontWeight.bold, fontSize: 12.sp,
+                  ))),
                 ),
-                child: Center(child: Text(tab, style: GoogleFonts.outfit(
-                  color: sel ? Colors.black : Colors.white54,
-                  fontWeight: FontWeight.bold, fontSize: 12.sp,
-                ))),
-              ),
-            ));
-          }).toList()),
-        ),
-        _sp(16),
-
-        if (!isGradientTab) ...[
-          // Solid color section
-          _lbl('COLORS'),
-          _clrRow(e!.color, (c) => controller.updateSelectedElement((x) => x.copyWith(color: c, shapeGradient: null))),
+              ));
+            }).toList()),
+          ),
           _sp(16),
-          _lbl('PRESET PALETTES'),
-          ..._presetPalettes().map((palette) => Container(
-            margin: EdgeInsets.only(bottom: 12.h),
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(12.r)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(palette['name'], style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
-              SizedBox(height: 8.h),
-              Row(children: (palette['colors'] as List<Color>).map((c) => Expanded(
-                child: GestureDetector(
-                  onTap: () => controller.updateSelectedElement((x) => x.copyWith(color: c, shapeGradient: null)),
-                  child: Container(
-                    height: 44.h,
-                    margin: EdgeInsets.only(right: 6.w),
-                    decoration: BoxDecoration(
-                      color: c,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(
-                        color: e.color?.value == c.value ? Colors.white : Colors.transparent,
-                        width: 2,
+
+          // ── SOLID tab ──
+          if (activeTab == 'SOLID') ...[
+            _lbl('TEXT FILL COLOR'),
+            // clrRow: picks a solid color, clears any gradient
+            _clrRow(e!.color, (c) => controller.updateSelectedElement((x) => x.copyWith(color: c, shapeGradient: null))),
+            _sp(16),
+            _lbl('PRESET PALETTES'),
+            ..._presetPalettes().map((palette) => Container(
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(12.r)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(palette['name'] as String, style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                SizedBox(height: 8.h),
+                Row(children: (palette['colors'] as List<Color>).map((c) => Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.updateSelectedElement((x) => x.copyWith(color: c, shapeGradient: null)),
+                    child: Container(
+                      height: 44.h,
+                      margin: EdgeInsets.only(right: 6.w),
+                      decoration: BoxDecoration(
+                        color: c,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: e.color?.value == c.value ? Colors.white : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )).toList()),
-            ]),
-          )),
-          _sp(4),
-          _lbl('OPACITY  •  ${(e.opacity * 100).toInt()}%'),
-          _sld(e.opacity, 0, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(opacity: v), saveHistory: false)),
-        ] else ...[
-          // Gradient section
-          _lbl('GRADIENTS'),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 10.h,
-            children: _gradients().sublist(0, 9).map((g) {
-              final isSel = e!.shapeGradient != null && e.shapeGradient!.first.value == g.first.value;
-              return GestureDetector(
-                onTap: () => controller.updateSelectedElement((x) => x.copyWith(shapeGradient: g, color: Colors.white)),
-                child: Container(
-                  width: 60.w, height: 60.w,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: g, begin: Alignment.topLeft, end: Alignment.bottomRight),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: isSel ? Colors.white : Colors.transparent, width: 2.5),
-                  ),
-                  child: isSel ? Icon(Icons.check_rounded, color: Colors.white, size: 20.sp) : null,
-                ),
-              );
-            }).toList(),
-          ),
-          _sp(12),
-          _lbl('RAINBOW'),
-          _buildGradientTile(_gradients()[9], e!),
-          _sp(12),
-          _lbl('3D STYLES'),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 10.h,
-            children: _gradients().sublist(10).map((g) => _buildGradientTile(g, e)).toList(),
-          ),
-          _sp(12),
-          _lbl('OPACITY  •  ${(e.opacity * 100).toInt()}%'),
-          _sld(e.opacity, 0, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(opacity: v), saveHistory: false)),
+                )).toList()),
+              ]),
+            )),
+            _sp(8),
+            _lbl('OPACITY  •  ${(e!.opacity * 100).toInt()}%'),
+            _sld(e!.opacity, 0, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(opacity: v), saveHistory: false)),
+          ],
+
+          // ── GRADIENT tab ──
+          if (activeTab == 'GRADIENT') ...[
+            _lbl('RAINBOW'),
+            _buildGradientTile(_gradients()[9], e!),
+            _sp(12),
+            _lbl('SOLID GRADIENTS'),
+            Wrap(
+              spacing: 10.w,
+              runSpacing: 10.h,
+              children: _gradients().sublist(0, 9).map((g) => _buildGradientTile(g, e)).toList(),
+            ),
+            _sp(12),
+            _lbl('TEXTURED & 3D STYLES'),
+            Wrap(
+              spacing: 10.w,
+              runSpacing: 10.h,
+              children: _gradients().sublist(10).map((g) => _buildGradientTile(g, e)).toList(),
+            ),
+            _sp(8),
+            _lbl('OPACITY  •  ${(e!.opacity * 100).toInt()}%'),
+            _sld(e!.opacity, 0, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(opacity: v), saveHistory: false)),
+          ],
+
+          _sp(10), _actRow(),
         ],
-        _sp(10), _actRow(),
-      ],
-    ]));
-  });
+      ]));
+    });
   }
 
   Widget _buildGradientTile(List<Color> g, EditorElement e) {
@@ -784,136 +825,97 @@ class EditorView extends GetView<EditorViewModel> {
   ];
 
   Widget _buildFontsPanel() {
-    final idx = controller.selectedIndex.value;
-    final hasText = idx != -1 && controller.components[idx].type == ElementType.text;
-    final hasNonText = idx != -1 && !hasText;
-    final e = hasText ? controller.components[idx] : null;
+    return Obx(() {
+      final idx = controller.selectedIndex.value;
+      final hasText = idx != -1 && idx < controller.components.length &&
+          controller.components[idx].type == ElementType.text;
+      final hasNonText = idx != -1 && !hasText;
+      final e = hasText ? controller.components[idx] : null;
 
-    // Font categories
-    final categories = {
-      'All Styles': controller.fonts,
-      'Gaming': ['Orbitron', 'Audiowide', 'Bungee', 'Press Start 2P'],
-      'Editorial': ['Playfair Display', 'Merriweather', 'Lora', 'Crimson Text'],
-      'Monospace': ['Roboto Mono', 'Source Code Pro', 'Courier Prime', 'Space Mono'],
-    };
+      final cats = ['All Styles', 'Gaming', 'Editorial', 'Monospace'];
 
-    return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      _phdr('Fonts'),
-      if (hasNonText)
-        // Disabled state for image/shape
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
-            borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(color: Colors.white12),
-          ),
-          child: Row(children: [
-            Icon(Icons.font_download_off_rounded, color: Colors.white24, size: 22.sp),
-            SizedBox(width: 12.w),
-            Expanded(child: Text(
-              'Fonts only apply to text elements.\nSelect a text element to change font.',
-              style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12.sp, height: 1.4),
-            )),
-          ]),
-        )
-      else if (!hasText)
-        _empty('Select a text element to pick a font', Icons.font_download_rounded)
-      else ...[
-        // Category tabs
-        SizedBox(
-          height: 36.h,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: categories.keys.map((cat) {
-              final isSelected = cat == 'All Styles';
-              return GestureDetector(
-                onTap: () {}, // TODO: Add category switching
-                child: Container(
-                  margin: EdgeInsets.only(right: 8.w),
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    cat,
-                    style: GoogleFonts.outfit(
-                      color: isSelected ? Colors.black : Colors.white70,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        _sp(12),
-        // Font cards
-        ...controller.fonts.map((font) => _buildFontCard(font, e!)),
-      ],
-    ]));
-  }
-
-  Widget _buildFontCard(String font, EditorElement e) {
-    final isSel = e.fontFamily == font;
-    return GestureDetector(
-      onTap: () => controller.updateSelectedElement((x) => x.copyWith(fontFamily: font)),
-      child: Container(
-        margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: isSel ? AppColors.accentPurpleBtn.withValues(alpha: 0.15) : AppColors.cardDark,
-          border: Border.all(
-            color: isSel ? AppColors.accentPurpleBtn : Colors.white12,
-            width: isSel ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+      return _panelPad(SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  font.toUpperCase(),
-                  style: GoogleFonts.outfit(
-                    color: isSel ? AppColors.accentPurpleBtn : Colors.white54,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
+            _phdr('Fonts'),
+            if (hasNonText)
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(color: Colors.white12),
                 ),
-                if (isSel)
-                  Icon(Icons.star, color: AppColors.accentPurpleBtn, size: 16.sp),
-              ],
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              e.content.isNotEmpty ? e.content : 'Team Name',
-              style: _getFont(font).copyWith(
-                color: Colors.white,
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
+                child: Row(children: [
+                  Icon(Icons.font_download_off_rounded, color: Colors.white24, size: 20.sp),
+                  SizedBox(width: 10.w),
+                  Expanded(child: Text(
+                    'Fonts only apply to text elements.\nSelect a text element to change font.',
+                    style: GoogleFonts.outfit(color: Colors.white38, fontSize: 11.sp, height: 1.3),
+                  )),
+                ]),
+              )
+            else if (!hasText)
+              _empty('Select a text element to pick a font', Icons.font_download_rounded)
+            else ...[
+              // ── Category selection ──
+              SizedBox(
+                height: 38.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: cats.length,
+                  itemBuilder: (context, i) {
+                    final cat = cats[i];
+                    final isSel = controller.selectedFontCategory.value == cat;
+                    return GestureDetector(
+                      onTap: () => controller.selectedFontCategory.value = cat,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: EdgeInsets.only(right: 8.w),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                        decoration: BoxDecoration(
+                          color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(cat, style: GoogleFonts.outfit(
+                          color: isSel ? Colors.black : Colors.white70,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.bold,
+                        )),
+                      ),
+                    );
+                  },
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              '${font.toUpperCase()} • VARIABLE',
-              style: GoogleFonts.outfit(
-                color: Colors.white38,
-                fontSize: 9.sp,
+              _sp(8), // Reduced spacing
+
+              // ── Font Grid ──
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8.w,
+                  mainAxisSpacing: 8.h,
+                  childAspectRatio: 2.3,
+                ),
+                itemCount: controller.filteredFonts.length,
+                itemBuilder: (context, i) => _fcard(controller.filteredFonts[i], e!),
               ),
-            ),
+            ],
+            _sp(15), // Very small spacer to keep it compact
+            _actRow(),
           ],
         ),
-      ),
-    );
+      ));
+    });
   }
+
 
   Widget _buildBackgroundPanel() {
     return Obx(() {
@@ -1167,7 +1169,7 @@ class EditorView extends GetView<EditorViewModel> {
       min: min,
       max: max,
       onChanged: onChange,
-      onChangeEnd: (_) => controller.commitSliderHistory(),
+      onChangeStart: (_) => controller.startSliderChange(),
     ),
   );
 
@@ -1201,12 +1203,38 @@ class EditorView extends GetView<EditorViewModel> {
     }).toList()));
   }
 
+  Widget _fcard(String name, EditorElement e) {
+    final isSel = e.fontFamily == name;
+    return GestureDetector(
+      onTap: () => controller.updateSelectedElement((x) => x.copyWith(fontFamily: name)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10.r),
+          border: isSel ? Border.all(color: Colors.white24, width: 1) : null,
+        ),
+        child: Center(
+          child: Text(
+            name,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: _getFont(name).copyWith(
+              color: isSel ? Colors.black : Colors.white,
+              fontSize: 11.sp,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _wchip(String label, FontWeight w, EditorElement e) {
-    final isSel = e.fontWeight == w;
+    final isSel = e.fontWeight?.value == w.value;
     return GestureDetector(onTap: () => controller.updateSelectedElement((x) => x.copyWith(fontWeight: w)), child: Container(
       margin: EdgeInsets.only(right: 8.w), padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
       decoration: BoxDecoration(color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(20.r)),
-      child: Text(label, style: GoogleFonts.outfit(color: isSel ? Colors.black : Colors.white70, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+      child: Text(label, style: GoogleFonts.outfit(color: isSel ? Colors.black : Colors.white70, fontSize: 11.sp, fontWeight: w)),
     ));
   }
 
@@ -1243,10 +1271,16 @@ class EditorView extends GetView<EditorViewModel> {
     [const Color(0xFF2B2E7A), const Color(0xFF9C6FFF)],
     // Rainbow
     [const Color(0xFFFF0000), const Color(0xFFFF7700), const Color(0xFFFFFF00), const Color(0xFF00FF00), const Color(0xFF0000FF), const Color(0xFF8B00FF)],
-    // 3D Gold
-    [const Color(0xFFFFD700), const Color(0xFFFFFFAA), const Color(0xFFB8860B), const Color(0xFFFFD700)],
-    // 3D Silver
-    [const Color(0xFF9E9E9E), const Color(0xFFFFFFFF), const Color(0xFF616161), const Color(0xFFBDBDBD)],
+    // 3D Gold (Textured)
+    [const Color(0xFFBF953F), const Color(0xFFFCF6BA), const Color(0xFFB38728), const Color(0xFFFBF5B7), const Color(0xFFAA771C)],
+    // 3D Silver (Chrome Texture)
+    [const Color(0xFF707070), const Color(0xFFFFFFFF), const Color(0xFF616161), const Color(0xFFE0E0E0), const Color(0xFF424242)],
+    // Cyber Neon (Texture)
+    [const Color(0xFFFF00FF), const Color(0xFF00FFFF), const Color(0xFF00FF00), const Color(0xFFFF00FF)],
+    // Deep Ocean (Texture)
+    [const Color(0xFF000428), const Color(0xFF004e92), const Color(0xFF00d2ff), const Color(0xFF004e92)],
+    // Carbon Fiber (Texture)
+    [const Color(0xFF232526), const Color(0xFF414345), const Color(0xFF232526), const Color(0xFF000000)],
     // 3D Red
     [const Color(0xFFB71C1C), const Color(0xFFFF5252), const Color(0xFF7F0000), const Color(0xFFFF1744)],
     // 3D Blue
@@ -1279,8 +1313,13 @@ class EditorView extends GetView<EditorViewModel> {
     ));
   }
 
-  TextStyle _getFont(String name) {
-    try { return GoogleFonts.getFont(name); } catch (_) { return GoogleFonts.manrope(); }
+}
+
+TextStyle _getFont(String name) {
+  try {
+    return GoogleFonts.getFont(name);
+  } catch (_) {
+    return GoogleFonts.manrope();
   }
 }
 
@@ -1304,7 +1343,32 @@ class _CurvedTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // More accurate measurement of text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: _getFont(element.fontFamily ?? 'Manrope').copyWith(
+          fontSize: realSize,
+          fontWeight: element.fontWeight,
+          letterSpacing: element.letterSpacing,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    final double measuredWidth = textPainter.width;
+    final double measuredHeight = textPainter.height;
+
+    // Calculate box size based on curve and measured dimensions + OUTLINE/GLOW padding
+    final double curveFactor = curveAngle.abs();
+    final double additionalHeight = curveFactor * measuredWidth * 0.5;
+    final double outlinePadding = (element.outlineWidth + element.glowRadius / 2) * 2;
+    
+    final double finalWidth = (measuredWidth + 60 + outlinePadding).clamp(100.0, 800.0);
+    final double finalHeight = (measuredHeight + additionalHeight + 40 + outlinePadding).clamp(60.0, 600.0);
+
     return CustomPaint(
+      key: ValueKey('curved_${element.id}_${element.content}_${element.color?.value ?? 0}_${element.shapeGradient.hashCode}'), // Force clean rebuild on color/gradient change
       painter: _CurvedTextPainter(
         text: text,
         curveAngle: curveAngle,
@@ -1319,7 +1383,7 @@ class _CurvedTextWidget extends StatelessWidget {
         glowRadius: element.glowRadius,
         gradient: element.shapeGradient,
       ),
-      child: const SizedBox(width: 300, height: 160),
+      size: Size(finalWidth, finalHeight),
     );
   }
 }
@@ -1363,24 +1427,34 @@ class _CurvedTextPainter extends CustomPainter {
 
     // Center of the arc
     final double cx = size.width / 2;
-    final double cy = curveUp ? size.height + radius - fontSize * 1.5 : -radius + fontSize * 0.5;
+    final double midY = size.height / 2;
+    final double cy = curveUp ? midY + radius : midY - radius;
 
     // Total angle span
     final double totalAngle = size.width / radius;
 
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
 
-    // Measure each character width
+    // Measure each character width using the actual font
     final List<double> charWidths = [];
     double totalWidth = 0;
+    
+    // Create base style without letterSpacing for measurement, 
+    // as we'll add it manually for better control in curved rendering
+    final baseStyle = _getFont(fontFamily).copyWith(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+    );
+
     for (int i = 0; i < text.length; i++) {
       textPainter.text = TextSpan(
         text: text[i],
-        style: TextStyle(fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing),
+        style: baseStyle,
       );
       textPainter.layout();
-      charWidths.add(textPainter.width + letterSpacing);
-      totalWidth += textPainter.width + letterSpacing;
+      double w = textPainter.width + letterSpacing;
+      charWidths.add(w);
+      totalWidth += w;
     }
 
     // Start angle so text is centered
@@ -1401,11 +1475,11 @@ class _CurvedTextPainter extends CustomPainter {
       if (glowRadius > 0) {
         textPainter.text = TextSpan(
           text: text[i],
-          style: TextStyle(
-            fontSize: fontSize, fontWeight: fontWeight,
+          style: baseStyle.copyWith(
             foreground: Paint()
               ..color = glowColor
               ..maskFilter = MaskFilter.blur(BlurStyle.normal, glowRadius / 3),
+            color: null,
           ),
         );
         textPainter.layout();
@@ -1416,12 +1490,12 @@ class _CurvedTextPainter extends CustomPainter {
       if (outlineWidth > 0) {
         textPainter.text = TextSpan(
           text: text[i],
-          style: TextStyle(
-            fontSize: fontSize, fontWeight: fontWeight,
+          style: baseStyle.copyWith(
             foreground: Paint()
               ..style = PaintingStyle.stroke
               ..strokeWidth = outlineWidth
               ..color = outlineColor,
+            color: null,
           ),
         );
         textPainter.layout();
@@ -1439,8 +1513,7 @@ class _CurvedTextPainter extends CustomPainter {
 
       textPainter.text = TextSpan(
         text: text[i],
-        style: TextStyle(
-          fontSize: fontSize, fontWeight: fontWeight,
+        style: baseStyle.copyWith(
           color: fillPaint == null ? color : null,
           foreground: fillPaint,
         ),
@@ -1455,7 +1528,18 @@ class _CurvedTextPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CurvedTextPainter old) =>
-      old.text != text || old.curveAngle != curveAngle || old.color != color;
+      old.text != text ||
+      old.curveAngle != curveAngle ||
+      old.fontSize != fontSize ||
+      old.color != color ||
+      old.fontFamily != fontFamily ||
+      old.fontWeight != fontWeight ||
+      old.letterSpacing != letterSpacing ||
+      old.outlineColor != outlineColor ||
+      old.outlineWidth != outlineWidth ||
+      old.glowColor != glowColor ||
+      old.glowRadius != glowRadius ||
+      old.gradient != gradient;
 }
 
 class _NoneColorPainter extends CustomPainter {

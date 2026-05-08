@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "955777504028",
+    "project_id": "logomaker-6d294",
+    "storage_bucket": "logomaker-6d294.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955777504028:android:597b1a71a81f01c57060d9",
+        "android_client_info": {
+          "package_name": "com.example.untitled1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "955777504028-o46ro8ta8ipj4ml518vmil38ogsbeupc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.untitled1",
+            "certificate_hash": "c7bfeeff652136a46f0d30b1360d83c6d42de8ce"
+          }
+        },
+        {
+          "client_id": "955777504028-d1905pd19r0qcsu7e0i5sjfvhg7913sm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMQAL69hlbGgWK6MCDBKNQzECczZenENk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955777504028-d1905pd19r0qcsu7e0i5sjfvhg7913sm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "955777504028-e3odpc113reruesjoog8g37lao4e294r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.untitled1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

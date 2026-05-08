@@ -1,0 +1,36 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "logomaker-6d294",
+          "appId": "1:955777504028:android:597b1a71a81f01c57060d9",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "logomaker-6d294",
+          "configurations": {
+            "android": "1:955777504028:android:597b1a71a81f01c57060d9",
+            "ios": "1:955777504028:ios:aafee1cfff9f30e47060d9"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

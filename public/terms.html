@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - Atelier Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0B0D13;
+            --card-bg: #1A1D25;
+            --primary-gradient: linear-gradient(135deg, #7B2FBE 0%, #4E2A8E 100%);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-purple: #9D4EDD;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-gradient);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 10px 30px rgba(123, 47, 190, 0.3);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #FFFFFF, #9D4EDD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        section {
+            margin-bottom: 35px;
+        }
+
+        h2 {
+            color: var(--accent-purple);
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: var(--primary-gradient);
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            margin-left: 10px;
+        }
+
+        li {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        li::before {
+            content: "→";
+            color: var(--accent-purple);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .contact-email {
+            color: var(--accent-purple);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .content-card {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-placeholder">A</div>
+            <h1>Terms & Conditions</h1>
+            <p style="color: var(--text-secondary)">Effective Date: May 2026</p>
+        </header>
+
+        <div class="content-card">
+            <section>
+                <p>By using <strong>Atelier Studio</strong>, you agree to comply with and be bound by these Terms and Conditions. Please read them carefully before using our service.</p>
+            </section>
+
+            <section>
+                <h2>Use of the App</h2>
+                <p>You agree to use the app lawfully and not misuse its features. The creative tools provided are intended for legitimate design and branding purposes.</p>
+            </section>
+
+            <section>
+                <h2>User Accounts</h2>
+                <p>You are responsible for maintaining the security of your account and for all activities that occur under your account (via Google Sign-In).</p>
+            </section>
+
+            <section>
+                <h2>Intellectual Property</h2>
+                <p>All app-original content, branding, and core functionality belong to the developer. Assets generated by the user are subject to the specific usage rights of the underlying AI models.</p>
+            </section>
+
+            <section>
+                <h2>Prohibited Activities</h2>
+                <ul>
+                    <li>Hacking, disrupting, or attempting to compromise the app's security.</li>
+                    <li>Using the app for any illegal or unauthorized purposes.</li>
+                    <li>Reverse engineering the AI generation process.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Limitation of Liability</h2>
+                <p>We are not responsible for any direct, indirect, or incidental damages or data loss resulting from your use or inability to use the application.</p>
+            </section>
+
+            <section>
+                <h2>Termination</h2>
+                <p>We reserve the right to suspend or terminate your access if these terms are violated or for any other reason deemed necessary for the safety of our users.</p>
+            </section>
+
+            <div class="footer">
+                <p>For questions regarding these terms, please reach out to us:</p>
+                <a href="mailto:xendersservices@gmail.com" class="contact-email">xendersservices@gmail.com</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

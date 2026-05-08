@@ -17,10 +17,15 @@ import '../../modules/onboarding/view_model/onboarding_view_model.dart';
 import '../../modules/ai_generator/view/ai_generator_view.dart';
 import '../../modules/ai_generator/view_model/ai_generator_view_model.dart';
 import '../../modules/profile/view/about_view.dart';
+import '../../modules/profile/view/personal_information_view.dart';
+import '../../modules/profile/view/notifications_view.dart';
 import '../../modules/history/view/history_detail_view.dart';
+import '../../modules/templates/view/templates_view.dart';
+import '../../modules/templates/view_model/templates_view_model.dart';
 
 class AppPages {
-  static const initial = AppRoutes.home;
+  static const initial = AppRoutes.splash;
+  static const notifications = '/notifications'; // Adding constant here or in AppRoutes
 
   static final routes = [
     GetPage(
@@ -80,8 +85,23 @@ class AppPages {
       page: () => const AboutView(),
     ),
     GetPage(
+      name: '/notifications',
+      page: () => const NotificationsView(),
+    ),
+    GetPage(
+      name: '/personal-info',
+      page: () => const PersonalInformationView(),
+    ),
+    GetPage(
       name: AppRoutes.historyDetail,
       page: () => const HistoryDetailView(),
+    ),
+    GetPage(
+      name: AppRoutes.templates,
+      page: () => const TemplatesView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => TemplatesViewModel());
+      }),
     ),
   ];
 }

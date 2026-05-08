@@ -9,15 +9,15 @@ class AboutView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: const Color(0xFF0B0D13),
       appBar: AppBar(
         title: Text(
           'About Us',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -30,15 +30,9 @@ class AboutView extends StatelessWidget {
               width: 120.w,
               height: 120.w,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF1A1D25),
                 borderRadius: BorderRadius.circular(30.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
-                    blurRadius: 30,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
               ),
               child: Center(
                 child: ClipRRect(
@@ -55,18 +49,18 @@ class AboutView extends StatelessWidget {
             
             SizedBox(height: 24.h),
             Text(
-              'The Ethereal Studio',
+              'Atelier Studio',
               style: GoogleFonts.outfit(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Colors.white,
               ),
             ),
             Text(
               'Version 1.0.0',
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
-                color: AppColors.textSecondary,
+                color: Colors.white38,
               ),
             ),
             
@@ -87,11 +81,11 @@ class AboutView extends StatelessWidget {
             SizedBox(height: 60.h),
             
             Text(
-              '© 2026 The Ethereal Studio. All rights reserved.',
+              '© 2026 Atelier Studio. All rights reserved.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: AppColors.textSecondary.withOpacity(0.6),
+                color: Colors.white24,
               ),
             ),
             SizedBox(height: 40.h),
@@ -106,15 +100,9 @@ class AboutView extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1A1D25),
         borderRadius: BorderRadius.circular(25.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +112,7 @@ class AboutView extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: const Color(0xFF9D4EDD),
             ),
           ),
           SizedBox(height: 12.h),
@@ -132,7 +120,7 @@ class AboutView extends StatelessWidget {
             description,
             style: GoogleFonts.outfit(
               fontSize: 15.sp,
-              color: AppColors.textPrimary.withOpacity(0.8),
+              color: Colors.white70,
               height: 1.5,
             ),
           ),

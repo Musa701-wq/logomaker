@@ -15,7 +15,7 @@ class HistoryDetailView extends StatelessWidget {
     final bool isAi = project['genType'] == 'ai';
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.premiumDark,
       appBar: AppBar(
         title: Text(
           'Creation Detail',
@@ -23,7 +23,7 @@ class HistoryDetailView extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -38,7 +38,7 @@ class HistoryDetailView extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 26.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Colors.white,
               ),
             ),
             Text(
@@ -94,7 +94,7 @@ class HistoryDetailView extends StatelessWidget {
       width: double.infinity,
       constraints: BoxConstraints(minHeight: 300.h),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: const Color(0xFF2B2E7A),
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
@@ -127,9 +127,9 @@ class HistoryDetailView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardDark,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: AppColors.dividerColor),
+        border: Border.all(color: Colors.white10),
       ),
       child: Row(
         children: [
@@ -140,7 +140,7 @@ class HistoryDetailView extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 15.sp,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: Colors.white,
             ),
           ),
         ],
@@ -153,15 +153,15 @@ class HistoryDetailView extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardDark,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: AppColors.dividerColor),
+        border: Border.all(color: Colors.white10),
       ),
       child: Text(
         prompt,
         style: GoogleFonts.outfit(
           fontSize: 14.sp,
-          color: AppColors.textPrimary.withOpacity(0.8),
+          color: Colors.white70,
           height: 1.5,
           fontStyle: FontStyle.italic,
         ),

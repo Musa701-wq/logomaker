@@ -1,7 +1,31 @@
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../app/routes/app_routes.dart';
 
 class HomeViewModel extends GetxController {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final RxInt selectedIndex = 0.obs;
+  final RxBool isGuest = true.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _auth.authStateChanges().listen((user) {
+      checkLoginStatus();
+    });
+  }
+
+  void checkLoginStatus() {
+    isGuest.value = _auth.currentUser == null;
+  }
+
+  void onCreateNewLogo() {
+    if (isGuest.value) {
+      Get.toNamed(AppRoutes.login);
+    } else {
+      Get.toNamed(AppRoutes.aiGenerator);
+    }
+  }
 
   void changeIndex(int index) {
     selectedIndex.value = index;
@@ -15,8 +39,8 @@ class HomeViewModel extends GetxController {
   final List<Map<String, String>> atelierProjects = [
     {'title': 'Prism Tech', 'time': '2 hours ago', 'image': 'assets/images/logo2.jpg'},
     {'title': 'Velvet Noir', 'time': 'Yesterday', 'image': 'assets/images/logo2.jpg'},
-    {'title': 'Bloom Studio', 'time': '3 days ago', 'image': 'assets/images/logo.png'},
-    {'title': 'Cyber Flux', 'time': 'Last week', 'image': 'assets/images/logo.png'},
+    {'title': 'Bloom Studio', 'time': '3 days ago', 'image': 'assets/images/logo1.jpg'},
+    {'title': 'Cyber Flux', 'time': 'Last week', 'image': 'assets/images/logo2.jpg'},
   ];
 
   // Legacy
