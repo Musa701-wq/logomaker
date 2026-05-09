@@ -150,6 +150,7 @@ class TemplatesView extends GetView<TemplatesViewModel> {
                     onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
                       'templateImage': template['image'],
                       'templateText': template['title'],
+                      'templateTextColor': template['textColor'],
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

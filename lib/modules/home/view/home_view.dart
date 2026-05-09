@@ -265,6 +265,7 @@ class HomeView extends GetView<HomeViewModel> {
       onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
         'templateImage': project['image'],
         'templateText': project['title'],
+        'templateTextColor': project['textColor'],
       }),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

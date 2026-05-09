@@ -196,7 +196,9 @@ class EditorViewModel extends GetxController {
         content: args['templateText'] ?? 'Esport',
         scale: 1.0,
         fontSize: 52,
-        color: Colors.white,
+        color: args['templateTextColor'] != null
+            ? Color(int.parse(args['templateTextColor'] as String))
+            : Colors.white,
         fontFamily: 'Oswald',
         fontWeight: FontWeight.w900,
         letterSpacing: 4.0,

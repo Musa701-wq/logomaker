@@ -14,48 +14,56 @@ class TemplatesViewModel extends GetxController {
       'subtitle': 'MINIMAL',
       'image': 'assets/images/logo1.jpg',
       'category': 'Minimal',
+      'textColor': '0xFF00B4FF', // blue
     },
     {
       'title': 'Fluid Dynamics',
       'subtitle': 'ABSTRACT',
       'image': 'assets/images/logo2.jpg',
       'category': 'Abstract',
+      'textColor': '0xFFFFFFFF', // white
     },
     {
       'title': 'Heritage Brew',
       'subtitle': 'RETRO',
       'image': 'assets/images/logo1.jpg',
       'category': 'Retro',
+      'textColor': '0xFFFF4D9E', // pink
     },
     {
       'title': 'Aurelius Gold',
       'subtitle': 'LUXURY',
       'image': 'assets/images/logo2.jpg',
       'category': 'Luxury',
+      'textColor': '0xFFB06EFF', // purple
     },
     {
       'title': 'Nexus Tech',
       'subtitle': 'MODERN',
       'image': 'assets/images/logo1.jpg',
       'category': 'Tech',
+      'textColor': '0xFF00B4FF', // blue
     },
     {
       'title': 'Ethereal Studio',
       'subtitle': 'FASHION',
       'image': 'assets/images/logo2.jpg',
       'category': 'Modern',
+      'textColor': '0xFFFF4D9E', // pink
     },
     {
       'title': 'Cyber Flux',
       'subtitle': 'TECH',
       'image': 'assets/images/logo1.jpg',
       'category': 'Tech',
+      'textColor': '0xFFB06EFF', // purple
     },
     {
       'title': 'Velvet Noir',
       'subtitle': 'LUXURY',
       'image': 'assets/images/logo2.jpg',
       'category': 'Luxury',
+      'textColor': '0xFFFFFFFF', // white
     },
   ];
 
