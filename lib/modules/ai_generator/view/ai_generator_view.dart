@@ -16,12 +16,12 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.sp),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87, size: 20.sp),
           onPressed: () => controller.previousStep(),
         ),
         title: Text(
           'Create New Logo',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.black87),
         ),
         centerTitle: true,
       ),
@@ -79,7 +79,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
                   child: LinearProgressIndicator(
                     value: controller.currentStep.value / 3,
                     minHeight: 4.h,
-                    backgroundColor: Colors.white.withOpacity(0.05),
+                    backgroundColor: Colors.grey.withOpacity(0.2),
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                   ),
                 ),
@@ -218,11 +218,11 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withOpacity(0.1) : const Color(0xFF1A1D25),
+            color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05)),
+            border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1)),
           ),
-          child: Text(text, style: GoogleFonts.outfit(color: isSelected ? Colors.white : Colors.white70, fontSize: 13.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+          child: Text(text, style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.black87, fontSize: 13.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
         ),
       );
     });
@@ -234,9 +234,9 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.02),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.white10, style: BorderStyle.solid),
+          border: Border.all(color: Colors.grey.withOpacity(0.1), style: BorderStyle.solid),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -254,17 +254,17 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1D25),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Obx(() => DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: controller.selectedFont.value,
-          dropdownColor: const Color(0xFF1A1D25),
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white38),
+          dropdownColor: Colors.white,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black54),
           isExpanded: true,
-          style: GoogleFonts.outfit(color: Colors.white, fontSize: 15.sp),
+          style: GoogleFonts.outfit(color: Colors.black87, fontSize: 15.sp),
           items: controller.fontStyles.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -291,16 +291,16 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 16.h),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary.withOpacity(0.1) : const Color(0xFF1A1D25),
+              color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white,
               borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05)),
+              border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: isSelected ? AppColors.primary : Colors.white38, size: 18.sp),
+                Icon(icon, color: isSelected ? AppColors.primary : Colors.black54, size: 18.sp),
                 SizedBox(width: 10.w),
-                Text(text, style: GoogleFonts.outfit(color: isSelected ? Colors.white : Colors.white38, fontWeight: FontWeight.bold, fontSize: 13.sp)),
+                Text(text, style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.black54, fontWeight: FontWeight.bold, fontSize: 13.sp)),
               ],
             ),
           ),
@@ -312,22 +312,22 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
   void _showAddIndustryDialog() {
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF1A1D25),
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        title: Text('Custom Industry', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text('Custom Industry', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller.customIndustryController,
           autofocus: true,
-          style: GoogleFonts.outfit(color: Colors.white),
+          style: GoogleFonts.outfit(color: Colors.black87),
           decoration: InputDecoration(
             hintText: 'Enter industry name...',
-            hintStyle: TextStyle(color: Colors.white10),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white10)),
+            hintStyle: TextStyle(color: Colors.black26),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.withOpacity(0.2))),
             focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primary)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('CANCEL', style: TextStyle(color: Colors.white38))),
+          TextButton(onPressed: () => Get.back(), child: Text('CANCEL', style: TextStyle(color: Colors.black54))),
           TextButton(onPressed: () => controller.addCustomIndustry(), child: Text('ADD', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
         ],
       ),
@@ -339,7 +339,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
       Container(
         padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1D25),
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
         ),
         child: Column(
@@ -349,8 +349,8 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Palette Builder', style: GoogleFonts.outfit(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                IconButton(onPressed: () => Get.back(), icon: Icon(Icons.close_rounded, color: Colors.white24)),
+                Text('Palette Builder', style: GoogleFonts.outfit(color: Colors.black87, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                IconButton(onPressed: () => Get.back(), icon: Icon(Icons.close_rounded, color: Colors.black26)),
               ],
             ),
             SizedBox(height: 20.h),
@@ -409,7 +409,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13.sp, fontWeight: FontWeight.w600)),
+        Text(label, style: GoogleFonts.outfit(color: Colors.black87, fontSize: 13.sp, fontWeight: FontWeight.w600)),
         SizedBox(height: 12.h),
         SizedBox(
           height: 35.h,
@@ -427,7 +427,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
                     color: color,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selectedColor.value == color ? Colors.white : Colors.white10,
+                      color: selectedColor.value == color ? Colors.black87 : Colors.grey.withOpacity(0.2),
                       width: 2,
                     ),
                   ),
@@ -449,9 +449,9 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.outfit(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(title, style: GoogleFonts.outfit(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.black87)),
         SizedBox(height: 8.h),
-        Text(sub, style: GoogleFonts.outfit(fontSize: 14.sp, color: Colors.white38)),
+        Text(sub, style: GoogleFonts.outfit(fontSize: 14.sp, color: Colors.black54)),
       ],
     );
   }
@@ -461,7 +461,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
       children: [
         Container(width: 4.w, height: 16.h, decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(2.r))),
         SizedBox(width: 8.w),
-        Text(title, style: GoogleFonts.outfit(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5)),
+        Text(title, style: GoogleFonts.outfit(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: 0.5)),
       ],
     );
   }
@@ -470,15 +470,15 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13.sp, fontWeight: FontWeight.w500)),
+        Text(label, style: GoogleFonts.outfit(color: Colors.black54, fontSize: 13.sp, fontWeight: FontWeight.w500)),
         SizedBox(height: 10.h),
         Container(
-          decoration: BoxDecoration(color: const Color(0xFF1A1D25), borderRadius: BorderRadius.circular(16.r), border: Border.all(color: Colors.white.withOpacity(0.05))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16.r), border: Border.all(color: Colors.grey.withOpacity(0.1))),
           child: TextField(
             controller: ctr,
-            style: GoogleFonts.outfit(color: Colors.white, fontSize: 14.sp),
+            style: GoogleFonts.outfit(color: Colors.black87, fontSize: 14.sp),
             decoration: InputDecoration(
-              hintText: hint, hintStyle: GoogleFonts.outfit(color: Colors.white10, fontSize: 14.sp),
+              hintText: hint, hintStyle: GoogleFonts.outfit(color: Colors.black26, fontSize: 14.sp),
               contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h), border: InputBorder.none,
             ),
           ),
@@ -494,16 +494,16 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         onTap: () => controller.selectedStyle.value = style['name'],
         child: Container(
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withOpacity(0.1) : const Color(0xFF1A1D25),
+            color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05)),
+            border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(style['icon'], color: isSelected ? AppColors.primary : Colors.white38, size: 24.sp),
+              Icon(style['icon'], color: isSelected ? AppColors.primary : Colors.black54, size: 24.sp),
               SizedBox(height: 8.h),
-              Text(style['name'], style: GoogleFonts.outfit(fontSize: 11.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500, color: isSelected ? Colors.white : Colors.white38)),
+              Text(style['name'], style: GoogleFonts.outfit(fontSize: 11.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500, color: isSelected ? Colors.black87 : Colors.black54)),
             ],
           ),
         ),
@@ -519,12 +519,12 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         child: Container(
           margin: EdgeInsets.only(bottom: 12.h),
           padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(color: const Color(0xFF1A1D25), borderRadius: BorderRadius.circular(16.r), border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16.r), border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1))),
           child: Row(
             children: [
-              Row(children: (p['colors'] as List<Color>).map((c) => Container(width: 24.w, height: 24.w, margin: EdgeInsets.only(right: 8.w), decoration: BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: Colors.white10)))).toList()),
+              Row(children: (p['colors'] as List<Color>).map((c) => Container(width: 24.w, height: 24.w, margin: EdgeInsets.only(right: 8.w), decoration: BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: Colors.grey.withOpacity(0.2))))).toList()),
               SizedBox(width: 8.w),
-              Text(p['name'], style: GoogleFonts.outfit(color: isSelected ? Colors.white : Colors.white70, fontSize: 14.sp)),
+              Text(p['name'], style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.black87, fontSize: 14.sp)),
               const Spacer(),
               if (isSelected) Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20.sp),
             ],
@@ -542,11 +542,11 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         child: Container(
           width: 140.w, margin: EdgeInsets.only(right: 12.w),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1D25), borderRadius: BorderRadius.circular(16.r), border: Border.all(color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05)),
+            color: Colors.white, borderRadius: BorderRadius.circular(16.r), border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1)),
             image: DecorationImage(image: AssetImage('assets/images/logo${text == "Kids" ? 1 : 2}.jpg'), fit: BoxFit.cover, opacity: 0.1),
           ),
           alignment: Alignment.bottomLeft, padding: EdgeInsets.all(12.w),
-          child: Text(text, style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.white, fontWeight: FontWeight.bold, fontSize: 13.sp)),
+          child: Text(text, style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp)),
         ),
       );
     });
@@ -600,16 +600,16 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
 
   Widget _buildLoadingOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.85),
+      color: Colors.white.withOpacity(0.9),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: 80.w, height: 80.w, child: CircularProgressIndicator(strokeWidth: 6, color: AppColors.primary)),
             SizedBox(height: 32.h),
-            Text('AI IS CRAFTING...', style: GoogleFonts.outfit(fontSize: 20.sp, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
+            Text('AI IS CRAFTING...', style: GoogleFonts.outfit(fontSize: 20.sp, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: 2)),
             SizedBox(height: 8.h),
-            Text('Synthesizing your visual identity', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 14.sp)),
+            Text('Synthesizing your visual identity', style: GoogleFonts.outfit(color: Colors.black54, fontSize: 14.sp)),
           ],
         ),
       ),

@@ -23,7 +23,7 @@ class HistoryDetailView extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -38,7 +38,7 @@ class HistoryDetailView extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 26.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black87,
               ),
             ),
             Text(
@@ -94,7 +94,7 @@ class HistoryDetailView extends StatelessWidget {
       width: double.infinity,
       constraints: BoxConstraints(minHeight: 300.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2E7A),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
@@ -117,7 +117,7 @@ class HistoryDetailView extends StatelessWidget {
       style: GoogleFonts.outfit(
         fontSize: 12.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.textSecondary.withOpacity(0.5),
+        color: Colors.black54,
         letterSpacing: 1,
       ),
     );
@@ -127,9 +127,12 @@ class HistoryDetailView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: AppColors.cardDark,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
       ),
       child: Row(
         children: [
@@ -140,7 +143,7 @@ class HistoryDetailView extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 15.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: Colors.black87,
             ),
           ),
         ],
@@ -153,15 +156,18 @@ class HistoryDetailView extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: AppColors.cardDark,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
       ),
       child: Text(
         prompt,
         style: GoogleFonts.outfit(
           fontSize: 14.sp,
-          color: Colors.white70,
+          color: Colors.black54,
           height: 1.5,
           fontStyle: FontStyle.italic,
         ),

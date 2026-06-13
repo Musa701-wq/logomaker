@@ -118,7 +118,7 @@ class EditorViewModel extends GetxController {
   }
   
   // Background State
-  final backgroundColor = const Color(0xFF0B0D13).obs; // AppColors.premiumDark
+  final backgroundColor = Colors.white.obs; // Light Theme
   final backgroundGradient = Rx<List<Color>?>(null);
   
   final List<String> fonts = [
@@ -177,8 +177,8 @@ class EditorViewModel extends GetxController {
       components.clear();
       selectedIndex.value = -1;
 
-      // Match the screenshot: dark indigo/blue background
-      backgroundColor.value = const Color(0xFF2B2E7A);
+      // Match the new light theme: white background
+      backgroundColor.value = Colors.white;
 
       final imgElement = EditorElement(
         id: DateTime.now().millisecondsSinceEpoch.toString() + '_img',

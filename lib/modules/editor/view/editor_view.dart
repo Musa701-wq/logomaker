@@ -13,7 +13,7 @@ import '../view_model/editor_view_model.dart';
 class DottedBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.05);
+    final paint = Paint()..color = Colors.black87.withValues(alpha: 0.05);
     const double spacing = 20.0;
     for (double i = 0; i < size.width; i += spacing) {
       for (double j = 0; j < size.height; j += spacing) {
@@ -157,7 +157,7 @@ class EditorView extends GetView<EditorViewModel> {
         children: [
           IconButton(
             onPressed: () => Get.back(),
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.sp),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87, size: 20.sp),
           ),
           SizedBox(width: 8.w),
           Expanded(
@@ -165,18 +165,26 @@ class EditorView extends GetView<EditorViewModel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Luminous Atelier',
-                  style: GoogleFonts.outfit(
-                    color: AppColors.accentPurpleBtn,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
+                ShaderMask(
+                  blendMode: BlendMode.srcIn,
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds),
+                  child: Text(
+                    'Luminous Atelier',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Text(
                   'UNTITLED LOGO',
                   style: GoogleFonts.outfit(
-                    color: Colors.white38,
+                    color: Colors.black38,
                     fontSize: 10.sp,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.2,
@@ -197,7 +205,7 @@ class EditorView extends GetView<EditorViewModel> {
                   'Design saved to history',
                   snackPosition: SnackPosition.BOTTOM,
                   backgroundColor: AppColors.accentPurpleBtn,
-                  colorText: Colors.white,
+                  colorText: Colors.black87,
                   duration: const Duration(seconds: 2),
                   margin: EdgeInsets.all(16.w),
                 );
@@ -205,7 +213,7 @@ class EditorView extends GetView<EditorViewModel> {
                 await controller.exportDesign();
               }
             },
-            color: const Color(0xFF1E1E2E),
+            color: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
             itemBuilder: (_) => [
               PopupMenuItem(
@@ -213,7 +221,7 @@ class EditorView extends GetView<EditorViewModel> {
                 child: Row(children: [
                   Icon(Icons.bookmark_rounded, color: AppColors.accentPurpleBtn, size: 18.sp),
                   SizedBox(width: 10.w),
-                  Text('Save to History', style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                  Text('Save to History', style: GoogleFonts.outfit(color: Colors.black87, fontSize: 13.sp)),
                 ]),
               ),
               PopupMenuItem(
@@ -221,19 +229,19 @@ class EditorView extends GetView<EditorViewModel> {
                 child: Row(children: [
                   Icon(Icons.folder_open_rounded, color: AppColors.accentPurpleBtn, size: 18.sp),
                   SizedBox(width: 10.w),
-                  Text('Export', style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                  Text('Export', style: GoogleFonts.outfit(color: Colors.black87, fontSize: 13.sp)),
                 ]),
               ),
             ],
             child: Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.black87.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: controller.isLoading.value
                   ? SizedBox(width: 20.sp, height: 20.sp, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accentPurpleBtn))
-                  : Icon(Icons.more_vert_rounded, color: Colors.white, size: 20.sp),
+                  : Icon(Icons.more_vert_rounded, color: Colors.black87, size: 20.sp),
             ),
           )),
         ],
@@ -244,14 +252,14 @@ class EditorView extends GetView<EditorViewModel> {
   Widget _buildTopActionBtn(IconData icon, VoidCallback tap) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.black87.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: IconButton(
         constraints: const BoxConstraints(),
         padding: EdgeInsets.all(8.w),
         onPressed: tap,
-        icon: Icon(icon, color: Colors.white, size: 20.sp),
+        icon: Icon(icon, color: Colors.black87, size: 20.sp),
       ),
     );
   }
@@ -265,24 +273,36 @@ class EditorView extends GetView<EditorViewModel> {
       },
       child: Align(
         alignment: Alignment.topCenter,
-        child: Obx(() => Container(
-          decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 40)]),
-          child: AspectRatio(
-            aspectRatio: controller.aspectRatio.value,
-            child: Screenshot(
-              controller: controller.screenshotController,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: controller.backgroundColor.value,
-                  gradient: controller.backgroundGradient.value != null ? LinearGradient(colors: controller.backgroundGradient.value!) : null,
-                ),
-                child: Stack(
-                  children: [
-                    CustomPaint(painter: DottedBackgroundPainter(), size: Size.infinite),
-                    ...controller.components.asMap().entries.map(
-                      (entry) => _buildDraggableElement(entry.key, entry.value),
+        child: Obx(() => Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 24.h, bottom: 16.h),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4.r),
+              border: Border.all(color: const Color(0xFFDDDDDD), width: 1),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 16, offset: const Offset(0, 4)),
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 1)),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4.r),
+              child: AspectRatio(
+                aspectRatio: controller.aspectRatio.value,
+                child: Screenshot(
+                  controller: controller.screenshotController,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: controller.backgroundColor.value,
+                      gradient: controller.backgroundGradient.value != null ? LinearGradient(colors: controller.backgroundGradient.value!) : null,
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        ...controller.components.asMap().entries.map(
+                          (entry) => _buildDraggableElement(entry.key, entry.value),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -345,7 +365,7 @@ class EditorView extends GetView<EditorViewModel> {
       if (isEditing) {
         // Styled Editor - use element's properties for the input field
         final double realSize = (element.fontSize ?? 24).sp * element.scale;
-        final Color textColor = element.shapeGradient != null ? element.shapeGradient!.first : (element.color ?? Colors.white);
+        final Color textColor = element.shapeGradient != null ? element.shapeGradient!.first : (element.color ?? Colors.black87);
         
         return IntrinsicWidth(
           child: TextFormField(
@@ -475,8 +495,8 @@ class EditorView extends GetView<EditorViewModel> {
     Widget buildText({Color? color, Paint? foreground}) {
       // If gradient is active, don't apply solid color (ShaderMask handles it)
       final effectiveColor = (element.shapeGradient != null && foreground == null)
-          ? Colors.white  // ShaderMask needs white base to tint correctly
-          : (foreground != null ? null : (color ?? element.color ?? Colors.white));
+          ? Colors.black87  // ShaderMask needs white base to tint correctly
+          : (foreground != null ? null : (color ?? element.color ?? Colors.black87));
 
       final style = _getFont(element.fontFamily ?? 'Manrope').copyWith(
         fontSize: realSize,
@@ -567,7 +587,7 @@ class EditorView extends GetView<EditorViewModel> {
                     child: Container(
                       width: 40.w, height: 4.h,
                       decoration: BoxDecoration(
-                        color: Colors.white38,
+                        color: Colors.black38,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -606,7 +626,7 @@ class EditorView extends GetView<EditorViewModel> {
       padding: EdgeInsets.symmetric(vertical: 12.h),
       decoration: BoxDecoration(
         color: AppColors.panelDark,
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        border: Border(top: BorderSide(color: Colors.black87.withValues(alpha: 0.05))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -636,10 +656,10 @@ class EditorView extends GetView<EditorViewModel> {
                 color: isSelected ? AppColors.accentPurpleBtn.withValues(alpha: 0.2) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: isSelected ? AppColors.accentPurpleBtn : Colors.white38, size: 24.sp),
+              child: Icon(icon, color: isSelected ? AppColors.accentPurpleBtn : Colors.black38, size: 24.sp),
             ),
             SizedBox(height: 4.h),
-            Text(label, style: GoogleFonts.outfit(color: isSelected ? AppColors.accentPurpleBtn : Colors.white38, fontSize: 10.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
+            Text(label, style: GoogleFonts.outfit(color: isSelected ? AppColors.accentPurpleBtn : Colors.black38, fontSize: 10.sp, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
           ],
         ),
       );
@@ -682,7 +702,7 @@ class EditorView extends GetView<EditorViewModel> {
       GestureDetector(onTap: () => controller.addImage(), child: Container(
         width: double.infinity, padding: EdgeInsets.symmetric(vertical: 14.h),
         decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r), border: Border.all(color: AppColors.accentPurpleBtn.withValues(alpha: 0.5))),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_rounded, color: AppColors.accentPurpleBtn, size: 20.sp), SizedBox(width: 8.w), Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.sp))]),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_rounded, color: AppColors.accentPurpleBtn, size: 20.sp), SizedBox(width: 8.w), Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp))]),
       )),
       _sp(14), _lbl('SHAPES'),
       Wrap(spacing: 8.w, runSpacing: 8.h, children: [
@@ -724,7 +744,7 @@ class EditorView extends GetView<EditorViewModel> {
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Center(child: Text(tab, style: GoogleFonts.outfit(
-                    color: sel ? Colors.black : Colors.white54,
+                    color: sel ? Colors.black : Colors.black54,
                     fontWeight: FontWeight.bold, fontSize: 12.sp,
                   ))),
                 ),
@@ -745,7 +765,7 @@ class EditorView extends GetView<EditorViewModel> {
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(12.r)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(palette['name'] as String, style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                Text(palette['name'] as String, style: GoogleFonts.outfit(color: Colors.black54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 SizedBox(height: 8.h),
                 Row(children: (palette['colors'] as List<Color>).map((c) => Expanded(
                   child: GestureDetector(
@@ -757,7 +777,7 @@ class EditorView extends GetView<EditorViewModel> {
                         color: c,
                         borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(
-                          color: e.color?.value == c.value ? Colors.white : Colors.transparent,
+                          color: e.color?.value == c.value ? Colors.black87 : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -803,15 +823,15 @@ class EditorView extends GetView<EditorViewModel> {
   Widget _buildGradientTile(List<Color> g, EditorElement e) {
     final isSel = e.shapeGradient != null && e.shapeGradient!.first.value == g.first.value;
     return GestureDetector(
-      onTap: () => controller.updateSelectedElement((x) => x.copyWith(shapeGradient: g, color: Colors.white)),
+      onTap: () => controller.updateSelectedElement((x) => x.copyWith(shapeGradient: g, color: Colors.black87)),
       child: Container(
         width: 60.w, height: 60.w,
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: g, begin: Alignment.topLeft, end: Alignment.bottomRight),
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: isSel ? Colors.white : Colors.transparent, width: 2.5),
+          border: Border.all(color: isSel ? Colors.black87 : Colors.transparent, width: 2.5),
         ),
-        child: isSel ? Icon(Icons.check_rounded, color: Colors.white, size: 20.sp) : null,
+        child: isSel ? Icon(Icons.check_rounded, color: Colors.black87, size: 20.sp) : null,
       ),
     );
   }
@@ -845,16 +865,16 @@ class EditorView extends GetView<EditorViewModel> {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: Colors.black87.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(color: Colors.white12),
+                  border: Border.all(color: Colors.black87.withOpacity(0.12)),
                 ),
                 child: Row(children: [
-                  Icon(Icons.font_download_off_rounded, color: Colors.white24, size: 20.sp),
+                  Icon(Icons.font_download_off_rounded, color: Colors.black87.withOpacity(0.24), size: 20.sp),
                   SizedBox(width: 10.w),
                   Expanded(child: Text(
                     'Fonts only apply to text elements.\nSelect a text element to change font.',
-                    style: GoogleFonts.outfit(color: Colors.white38, fontSize: 11.sp, height: 1.3),
+                    style: GoogleFonts.outfit(color: Colors.black38, fontSize: 11.sp, height: 1.3),
                   )),
                 ]),
               )
@@ -878,11 +898,11 @@ class EditorView extends GetView<EditorViewModel> {
                         margin: EdgeInsets.only(right: 8.w),
                         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                         decoration: BoxDecoration(
-                          color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05),
+                          color: isSel ? AppColors.accentPurpleBtn : Colors.black87.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Text(cat, style: GoogleFonts.outfit(
-                          color: isSel ? Colors.black : Colors.white70,
+                          color: isSel ? Colors.black : Colors.black87.withOpacity(0.7),
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                         )),
@@ -922,7 +942,7 @@ class EditorView extends GetView<EditorViewModel> {
       final bgTab = controller.bgTab.value;
       return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       _phdr('Background'),
-      Text('Select the atmosphere for your atelier', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12.sp)),
+      Text('Select the atmosphere for your atelier', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp)),
       _sp(14),
       // Tabs: TRANSPARENT | SOLID | GRADIENT | TEXTURE
       Container(
@@ -939,7 +959,7 @@ class EditorView extends GetView<EditorViewModel> {
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Center(child: Text(tab, style: GoogleFonts.outfit(
-                color: sel ? Colors.black : Colors.white38,
+                color: sel ? Colors.black : Colors.black38,
                 fontWeight: FontWeight.bold, fontSize: 9.sp,
               ))),
             ),
@@ -963,14 +983,14 @@ class EditorView extends GetView<EditorViewModel> {
           ),
         )),
         _sp(12),
-        Center(child: Text('No background (transparent)', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12.sp))),
+        Center(child: Text('No background (transparent)', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp))),
       ]
       else if (bgTab == 'SOLID') ...[
         _lbl('COLORS'),
         _clrRow(
           controller.backgroundGradient.value == null ? controller.backgroundColor.value : Colors.transparent,
           (c) => controller.setBackgroundColor(c),
-          extra: [Colors.white, Colors.black, const Color(0xFF2B2E7A), const Color(0xFF1a1a2e), const Color(0xFF0f3460), Colors.deepPurple, Colors.teal, Colors.blueGrey, const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)],
+          extra: [Colors.black87, Colors.black, const Color(0xFF2B2E7A), const Color(0xFF1a1a2e), const Color(0xFF0f3460), Colors.deepPurple, Colors.teal, Colors.blueGrey, const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)],
         ),
         _sp(16),
         _lbl('PRESET PALETTES'),
@@ -979,7 +999,7 @@ class EditorView extends GetView<EditorViewModel> {
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(12.r)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(palette['name'], style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text(palette['name'], style: GoogleFonts.outfit(color: Colors.black54, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 1)),
             SizedBox(height: 8.h),
             Row(children: (palette['colors'] as List<Color>).map((c) => Expanded(
               child: GestureDetector(
@@ -991,7 +1011,7 @@ class EditorView extends GetView<EditorViewModel> {
                     color: c,
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
-                      color: controller.backgroundColor.value.value == c.value ? Colors.white : Colors.transparent,
+                      color: controller.backgroundColor.value.value == c.value ? Colors.black87 : Colors.transparent,
                       width: 2,
                     ),
                   ),
@@ -1016,9 +1036,9 @@ class EditorView extends GetView<EditorViewModel> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: g, begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: isSel ? Colors.white : Colors.transparent, width: 2.5),
+                  border: Border.all(color: isSel ? Colors.black87 : Colors.transparent, width: 2.5),
                 ),
-                child: isSel ? Icon(Icons.check_rounded, color: Colors.white, size: 20.sp) : null,
+                child: isSel ? Icon(Icons.check_rounded, color: Colors.black87, size: 20.sp) : null,
               ),
             );
           }).toList(),
@@ -1029,11 +1049,11 @@ class EditorView extends GetView<EditorViewModel> {
         Center(child: Padding(
           padding: EdgeInsets.symmetric(vertical: 24.h),
           child: Column(children: [
-            Icon(Icons.texture_rounded, color: Colors.white24, size: 40.sp),
+            Icon(Icons.texture_rounded, color: Colors.black87.withOpacity(0.24), size: 40.sp),
             SizedBox(height: 10.h),
-            Text('Textures coming soon', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13.sp)),
+            Text('Textures coming soon', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
             SizedBox(height: 4.h),
-            Text('Add images to assets/textures/', style: GoogleFonts.outfit(color: Colors.white24, fontSize: 10.sp)),
+            Text('Add images to assets/textures/', style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.24), fontSize: 10.sp)),
           ]),
         )),
       ],
@@ -1045,9 +1065,9 @@ class EditorView extends GetView<EditorViewModel> {
         child: Container(margin: EdgeInsets.only(right: 10.w), padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: controller.aspectRatio.value == r['ratio'] ? AppColors.accentPurpleBtn.withValues(alpha: 0.15) : AppColors.cardDark,
-            borderRadius: BorderRadius.circular(10.r), border: Border.all(color: controller.aspectRatio.value == r['ratio'] ? AppColors.accentPurpleBtn : Colors.white12),
+            borderRadius: BorderRadius.circular(10.r), border: Border.all(color: controller.aspectRatio.value == r['ratio'] ? AppColors.accentPurpleBtn : Colors.black87.withOpacity(0.12)),
           ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(r['icon'], color: controller.aspectRatio.value == r['ratio'] ? AppColors.accentPurpleBtn : Colors.white54, size: 18.sp), Text(r['name'], style: GoogleFonts.outfit(color: Colors.white70, fontSize: 9.sp))]),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(r['icon'], color: controller.aspectRatio.value == r['ratio'] ? AppColors.accentPurpleBtn : Colors.black54, size: 18.sp), Text(r['name'], style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.7), fontSize: 9.sp))]),
         ),
       )).toList())),
     ]));
@@ -1094,7 +1114,7 @@ class EditorView extends GetView<EditorViewModel> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.r),
-                            border: Border.all(color: isSel ? AppColors.accentPurpleBtn : Colors.white12, width: isSel ? 2 : 1),
+                            border: Border.all(color: isSel ? AppColors.accentPurpleBtn : Colors.black87.withOpacity(0.12), width: isSel ? 2 : 1),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(9.r),
@@ -1130,12 +1150,12 @@ class EditorView extends GetView<EditorViewModel> {
 
   Widget _panelPad(Widget child) => Padding(padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h), child: child);
   Widget _sp(double h) => SizedBox(height: h.h);
-  Widget _lbl(String t) => Padding(padding: EdgeInsets.only(bottom: 5.h), child: Text(t, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 0.8)));
+  Widget _lbl(String t) => Padding(padding: EdgeInsets.only(bottom: 5.h), child: Text(t, style: GoogleFonts.outfit(color: Colors.black38, fontSize: 10.sp, fontWeight: FontWeight.bold, letterSpacing: 0.8)));
 
   Widget _phdr(String title, {VoidCallback? undo, VoidCallback? redo, VoidCallback? add}) => Padding(
     padding: EdgeInsets.only(bottom: 14.h),
     child: Row(children: [
-      Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+      Text(title, style: GoogleFonts.outfit(color: Colors.black87, fontSize: 20.sp, fontWeight: FontWeight.bold)),
       const Spacer(),
       if (undo != null) _icnBtn(Icons.undo_rounded, undo),
       if (redo != null) ...[SizedBox(width: 8.w), _icnBtn(Icons.redo_rounded, redo)],
@@ -1145,25 +1165,25 @@ class EditorView extends GetView<EditorViewModel> {
 
   Widget _icnBtn(IconData icon, VoidCallback tap, {Color? color}) => InkWell(
     onTap: tap,
-    child: Container(padding: EdgeInsets.all(7.w), decoration: const BoxDecoration(color: Colors.white10, shape: BoxShape.circle), child: Icon(icon, color: color ?? Colors.white, size: 17.sp)),
+    child: Container(padding: EdgeInsets.all(7.w), decoration: BoxDecoration(color: Colors.black87.withOpacity(0.1), shape: BoxShape.circle), child: Icon(icon, color: color ?? Colors.black87, size: 17.sp)),
   );
 
   Widget _empty(String msg, IconData icon) => Padding(
     padding: EdgeInsets.symmetric(vertical: 24.h),
     child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, color: Colors.white10, size: 40.sp), SizedBox(height: 10.h),
-      Text(msg, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13.sp), textAlign: TextAlign.center),
+      Icon(icon, color: Colors.black87.withOpacity(0.1), size: 40.sp), SizedBox(height: 10.h),
+      Text(msg, style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp), textAlign: TextAlign.center),
     ])),
   );
 
   Widget _tf(String val, void Function(String) onChange) => Container(
     padding: EdgeInsets.symmetric(horizontal: 12.w),
     decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(12.r)),
-    child: TextFormField(initialValue: val, onChanged: onChange, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(border: InputBorder.none)),
+    child: TextFormField(initialValue: val, onChanged: onChange, style: const TextStyle(color: Colors.black87), decoration: const InputDecoration(border: InputBorder.none)),
   );
 
   Widget _sld(double val, double min, double max, void Function(double) onChange) => SliderTheme(
-    data: SliderThemeData(trackHeight: 2, activeTrackColor: AppColors.accentPurpleBtn, inactiveTrackColor: Colors.white10, thumbColor: Colors.white, overlayColor: AppColors.accentPurpleBtn.withValues(alpha: 0.2), thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6)),
+    data: SliderThemeData(trackHeight: 2, activeTrackColor: AppColors.accentPurpleBtn, inactiveTrackColor: Colors.black87.withOpacity(0.1), thumbColor: Colors.black87, overlayColor: AppColors.accentPurpleBtn.withValues(alpha: 0.2), thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6)),
     child: Slider(
       value: val.clamp(min, max),
       min: min,
@@ -1174,7 +1194,7 @@ class EditorView extends GetView<EditorViewModel> {
   );
 
   Widget _clrRow(Color? selected, void Function(Color) onColor, {List<Color>? extra}) {
-    final baseColors = extra ?? [Colors.white, Colors.black, const Color(0xFFFF3B30), const Color(0xFFFF9500), const Color(0xFFFFCC00), const Color(0xFF34C759), const Color(0xFF007AFF), const Color(0xFF5856D6), const Color(0xFFFF2D55), const Color(0xFF00C7BE), AppColors.accentPurpleBtn, AppColors.accentCyan];
+    final baseColors = extra ?? [Colors.black87, Colors.black, const Color(0xFFFF3B30), const Color(0xFFFF9500), const Color(0xFFFFCC00), const Color(0xFF34C759), const Color(0xFF007AFF), const Color(0xFF5856D6), const Color(0xFFFF2D55), const Color(0xFF00C7BE), AppColors.accentPurpleBtn, AppColors.accentCyan];
     // Always prepend "no color" transparent circle as first option
     final colors = [Colors.transparent, ...baseColors];
     // If selected is null or transparent, treat transparent as selected
@@ -1191,7 +1211,7 @@ class EditorView extends GetView<EditorViewModel> {
             color: c == Colors.transparent ? null : c,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isSel ? Colors.white : Colors.white24,
+              color: isSel ? Colors.black87 : Colors.black87.withOpacity(0.24),
               width: isSel ? 2.5 : 1,
             ),
           ),
@@ -1209,9 +1229,9 @@ class EditorView extends GetView<EditorViewModel> {
       onTap: () => controller.updateSelectedElement((x) => x.copyWith(fontFamily: name)),
       child: Container(
         decoration: BoxDecoration(
-          color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05),
+          color: isSel ? AppColors.accentPurpleBtn : Colors.black87.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10.r),
-          border: isSel ? Border.all(color: Colors.white24, width: 1) : null,
+          border: isSel ? Border.all(color: Colors.black87.withOpacity(0.24), width: 1) : null,
         ),
         child: Center(
           child: Text(
@@ -1220,7 +1240,7 @@ class EditorView extends GetView<EditorViewModel> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: _getFont(name).copyWith(
-              color: isSel ? Colors.black : Colors.white,
+              color: isSel ? Colors.black : Colors.black87,
               fontSize: 11.sp,
             ),
           ),
@@ -1233,15 +1253,15 @@ class EditorView extends GetView<EditorViewModel> {
     final isSel = e.fontWeight?.value == w.value;
     return GestureDetector(onTap: () => controller.updateSelectedElement((x) => x.copyWith(fontWeight: w)), child: Container(
       margin: EdgeInsets.only(right: 8.w), padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-      decoration: BoxDecoration(color: isSel ? AppColors.accentPurpleBtn : Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(20.r)),
-      child: Text(label, style: GoogleFonts.outfit(color: isSel ? Colors.black : Colors.white70, fontSize: 11.sp, fontWeight: w)),
+      decoration: BoxDecoration(color: isSel ? AppColors.accentPurpleBtn : Colors.black87.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(20.r)),
+      child: Text(label, style: GoogleFonts.outfit(color: isSel ? Colors.black : Colors.black87.withOpacity(0.7), fontSize: 11.sp, fontWeight: w)),
     ));
   }
 
   Widget _shpBtn(String label, IconData icon, String type) => GestureDetector(
     onTap: () => controller.addShape(type),
-    child: Container(padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h), decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(10.r), border: Border.all(color: Colors.white12)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: Colors.white70, size: 16.sp), SizedBox(width: 6.w), Text(label, style: GoogleFonts.outfit(color: Colors.white70, fontSize: 11.sp))])),
+    child: Container(padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h), decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(10.r), border: Border.all(color: Colors.black87.withOpacity(0.12))),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: Colors.black87.withOpacity(0.7), size: 16.sp), SizedBox(width: 6.w), Text(label, style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.7), fontSize: 11.sp))])),
   );
 
   Widget _actRow() => Row(children: [
@@ -1254,8 +1274,8 @@ class EditorView extends GetView<EditorViewModel> {
   Widget _actBtn(IconData icon, String label, VoidCallback tap, {Color? color}) => Expanded(child: GestureDetector(
     onTap: tap,
     child: Container(margin: EdgeInsets.only(right: 6.w), padding: EdgeInsets.symmetric(vertical: 8.h),
-      decoration: BoxDecoration(color: color != null ? color.withValues(alpha: 0.1) : AppColors.cardDark, borderRadius: BorderRadius.circular(10.r), border: Border.all(color: color ?? Colors.white10)),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: color ?? Colors.white70, size: 18.sp), Text(label, style: GoogleFonts.outfit(color: color ?? Colors.white54, fontSize: 9.sp))]),
+      decoration: BoxDecoration(color: color != null ? color.withValues(alpha: 0.1) : AppColors.cardDark, borderRadius: BorderRadius.circular(10.r), border: Border.all(color: color ?? Colors.black87.withOpacity(0.1))),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: color ?? Colors.black87.withOpacity(0.7), size: 18.sp), Text(label, style: GoogleFonts.outfit(color: color ?? Colors.black54, fontSize: 9.sp))]),
     ),
   ));
 
@@ -1294,16 +1314,16 @@ class EditorView extends GetView<EditorViewModel> {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(color: AppColors.panelDark, borderRadius: BorderRadius.vertical(top: Radius.circular(28.r))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('Layers', style: GoogleFonts.outfit(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        Text('Layers', style: GoogleFonts.outfit(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold)),
         SizedBox(height: 16.h),
         Obx(() => Column(children: controller.components.asMap().entries.map((en) {
           final el = en.value; final i = en.key;
           return ListTile(
-            leading: Icon(el.type == ElementType.text ? Icons.title : el.type == ElementType.image ? Icons.image : Icons.category, color: Colors.white54),
-            title: Text(el.type == ElementType.text ? el.content : el.type == ElementType.image ? 'Image Layer' : 'Shape Layer', style: const TextStyle(color: Colors.white)),
+            leading: Icon(el.type == ElementType.text ? Icons.title : el.type == ElementType.image ? Icons.image : Icons.category, color: Colors.black54),
+            title: Text(el.type == ElementType.text ? el.content : el.type == ElementType.image ? 'Image Layer' : 'Shape Layer', style: const TextStyle(color: Colors.black87)),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-              IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), icon: Icon(Icons.arrow_upward, color: i < controller.components.length - 1 ? Colors.white : Colors.white24, size: 18), onPressed: i < controller.components.length - 1 ? () => controller.moveLayer(i, i + 1) : null),
-              IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), icon: Icon(Icons.arrow_downward, color: i > 0 ? Colors.white : Colors.white24, size: 18), onPressed: i > 0 ? () => controller.moveLayer(i, i - 1) : null),
+              IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), icon: Icon(Icons.arrow_upward, color: i < controller.components.length - 1 ? Colors.black87 : Colors.black87.withOpacity(0.24), size: 18), onPressed: i < controller.components.length - 1 ? () => controller.moveLayer(i, i + 1) : null),
+              IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), icon: Icon(Icons.arrow_downward, color: i > 0 ? Colors.black87 : Colors.black87.withOpacity(0.24), size: 18), onPressed: i > 0 ? () => controller.moveLayer(i, i - 1) : null),
               IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () { controller.selectElement(i); controller.removeSelected(); Get.back(); }),
             ]),
             onTap: () { controller.selectElement(i); Get.back(); },
@@ -1373,7 +1393,7 @@ class _CurvedTextWidget extends StatelessWidget {
         text: text,
         curveAngle: curveAngle,
         fontSize: realSize,
-        color: element.shapeGradient != null ? Colors.white : (element.color ?? Colors.white),
+        color: element.shapeGradient != null ? Colors.black87 : (element.color ?? Colors.black87),
         fontFamily: element.fontFamily ?? 'Manrope',
         fontWeight: element.fontWeight ?? FontWeight.normal,
         letterSpacing: element.letterSpacing,
@@ -1546,7 +1566,7 @@ class _NoneColorPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white38
+      ..color = Colors.black38
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
     // Draw circle

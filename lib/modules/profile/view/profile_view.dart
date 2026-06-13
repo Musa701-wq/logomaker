@@ -14,7 +14,7 @@ class ProfileView extends GetView<ProfileViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.premiumDark,
+      backgroundColor: const Color(0xFFF8F9FA), // Light background
       body: SafeArea(
         child: Obx(() => CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -26,18 +26,26 @@ class ProfileView extends GetView<ProfileViewModel> {
                 child: Row(
                   children: [
                     const Spacer(),
-                    Text(
-                      'The Ethereal Studio',
-                      style: GoogleFonts.outfit(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                    ShaderMask(
+                      blendMode: BlendMode.srcIn,
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        'The Ethereal Studio',
+                        style: GoogleFonts.outfit(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     const Spacer(),
                     CircleAvatar(
                       radius: 20.r,
-                      backgroundColor: Colors.white10,
+                      backgroundColor: AppColors.accentPurpleBtn.withOpacity(0.1),
                       backgroundImage: const AssetImage('assets/images/logo1.jpg'),
                     ),
                   ],
@@ -45,16 +53,26 @@ class ProfileView extends GetView<ProfileViewModel> {
               ),
             ),
 
-            // Profile Header Card
+            // Profile Header Card (gradient banner style)
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: Container(
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    color: AppColors.cardDark,
+                    gradient: LinearGradient(
+                      colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(30.r),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accentPurpleBtn.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -64,7 +82,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                           Container(
                             padding: EdgeInsets.all(4.w),
                             decoration: BoxDecoration(
-                              color: AppColors.cardDark,
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(30.r),
                             ),
                             child: ClipRRect(
@@ -81,7 +99,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                               decoration: BoxDecoration(
-                                color: AppColors.primary,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
                               child: Text(
@@ -89,14 +107,14 @@ class ProfileView extends GetView<ProfileViewModel> {
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.accentPurpleBtn,
                                 ),
                               ),
                             ),
                         ],
                       ),
+                      SizedBox(height: 12.h),
                       if (controller.isGuest.value) ...[
-                        SizedBox(height: 10.h),
                         Text(
                           'Welcome to Atelier',
                           style: GoogleFonts.outfit(
@@ -110,24 +128,30 @@ class ProfileView extends GetView<ProfileViewModel> {
                           'Sign in to sync your designs across devices',
                           style: GoogleFonts.outfit(
                             fontSize: 13.sp,
-                            color: Colors.white38,
+                            color: Colors.white70,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 24.h),
                         GestureDetector(
                           onTap: () => Get.toNamed(AppRoutes.login),
                           child: Container(
                             width: double.infinity,
-                            padding: EdgeInsets.symmetric(vertical: 16.h),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [AppColors.primary, Color(0xFF9C6FFF)]),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(16.r),
-                              boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))],
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               'SIGN IN / REGISTER',
-                              style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp, letterSpacing: 1),
+                              style: GoogleFonts.outfit(
+                                color: AppColors.accentPurpleBtn,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.sp,
+                                letterSpacing: 1,
+                              ),
                             ),
                           ),
                         ),
@@ -145,27 +169,28 @@ class ProfileView extends GetView<ProfileViewModel> {
                           controller.userEmail.value,
                           style: GoogleFonts.outfit(
                             fontSize: 13.sp,
-                            color: Colors.white38,
+                            color: Colors.white70,
                           ),
                         ),
-                        SizedBox(height: 24.h),
+                        SizedBox(height: 16.h),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(color: Colors.white.withOpacity(0.4)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.workspace_premium_rounded, color: AppColors.primary, size: 16.sp),
+                              Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 16.sp),
                               SizedBox(width: 8.w),
                               Text(
                                 'PREMIUM MEMBER',
                                 style: GoogleFonts.outfit(
                                   fontSize: 11.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
@@ -185,7 +210,11 @@ class ProfileView extends GetView<ProfileViewModel> {
                   padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                   child: Container(
                     padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(25.r)),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25.r),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4))],
+                    ),
                     child: InkWell(
                       onTap: () => Get.find<HomeViewModel>().selectedIndex.value = 2,
                       borderRadius: BorderRadius.circular(25.r),
@@ -195,32 +224,49 @@ class ProfileView extends GetView<ProfileViewModel> {
                             children: [
                               Container(
                                 padding: EdgeInsets.all(10.w),
-                                decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12.r)),
-                                child: Icon(Icons.subscriptions_rounded, color: AppColors.primary, size: 20.sp),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accentPurpleBtn.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Icon(Icons.subscriptions_rounded, color: AppColors.accentPurpleBtn, size: 20.sp),
                               ),
                               SizedBox(width: 16.w),
-                              Text('Subscription Plan', style: GoogleFonts.outfit(fontSize: 17.sp, fontWeight: FontWeight.w600, color: Colors.white)),
+                              Text('Subscription Plan', style: GoogleFonts.outfit(fontSize: 17.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
                               const Spacer(),
-                              Text('MANAGE', style: GoogleFonts.outfit(fontSize: 12.sp, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              Text('MANAGE', style: GoogleFonts.outfit(fontSize: 12.sp, fontWeight: FontWeight.bold, color: AppColors.accentPurpleBtn)),
                             ],
                           ),
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 16.h),
                           Container(
                             padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(20.r)),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F9FA),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
                             child: Column(
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Monthly Premium', style: TextStyle(fontSize: 13.sp, color: Colors.white38)),
-                                    Text('\$24.99/mo', style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    Text('Monthly Premium', style: GoogleFonts.outfit(fontSize: 13.sp, color: Colors.black54)),
+                                    ShaderMask(
+                                      blendMode: BlendMode.srcIn,
+                                      shaderCallback: (b) => LinearGradient(
+                                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                                      ).createShader(b),
+                                      child: Text('\$24.99/mo', style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 12.h),
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10.r),
-                                  child: LinearProgressIndicator(value: 0.75, minHeight: 4.h, backgroundColor: Colors.white.withOpacity(0.05), valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary)),
+                                  child: LinearProgressIndicator(
+                                    value: 0.75,
+                                    minHeight: 6.h,
+                                    backgroundColor: Colors.grey.withOpacity(0.15),
+                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentPurpleBtn),
+                                  ),
                                 ),
                               ],
                             ),
@@ -231,7 +277,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                   ),
                 ),
               ),
-              
+
               // Account Settings
               _buildSectionTitle('ACCOUNT SETTINGS'),
               SliverToBoxAdapter(
@@ -239,11 +285,17 @@ class ProfileView extends GetView<ProfileViewModel> {
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Container(
                     padding: EdgeInsets.all(8.w),
-                    decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(25.r)),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25.r),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                    ),
                     child: Column(
                       children: [
                         _buildSettingsRow(Icons.person_outline_rounded, 'Personal Information', 'Manage name and contact details', onTap: () => Get.toNamed('/personal-info')),
+                        _buildDivider(),
                         _buildSettingsRow(Icons.info_outline_rounded, 'About Us', 'Learn more about Atelier Studio', onTap: () => Get.toNamed(AppRoutes.about)),
+                        _buildDivider(),
                         _buildSettingsRow(Icons.payment_rounded, 'Payment Methods', 'Manage your cards and billing', onTap: () {}),
                       ],
                     ),
@@ -259,21 +311,26 @@ class ProfileView extends GetView<ProfileViewModel> {
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Container(
                   padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(25.r)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(25.r),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
                   child: Column(
                     children: [
                       _buildSettingsRow(
-                        Icons.privacy_tip_outlined, 
-                        'Privacy Policy', 
+                        Icons.privacy_tip_outlined,
+                        'Privacy Policy',
                         'How we handle and protect your data',
                         onTap: () async {
                           final url = Uri.parse('https://logomaker-6d294.web.app/privacy.html');
                           if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
                         },
                       ),
+                      _buildDivider(),
                       _buildSettingsRow(
-                        Icons.description_outlined, 
-                        'Terms and Conditions', 
+                        Icons.description_outlined,
+                        'Terms and Conditions',
                         'Our service agreements',
                         onTap: () async {
                           final url = Uri.parse('https://logomaker-6d294.web.app/terms.html');
@@ -296,10 +353,15 @@ class ProfileView extends GetView<ProfileViewModel> {
                         onTap: () => controller.logout(),
                         child: Container(
                           width: double.infinity,
-                          height: 56.h,
-                          decoration: BoxDecoration(color: const Color(0xFF1A1D25), borderRadius: BorderRadius.circular(16.r), border: Border.all(color: Colors.white.withOpacity(0.05))),
+                          height: 54.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                            border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                          ),
                           alignment: Alignment.center,
-                          child: Text('SIGN OUT', style: GoogleFonts.outfit(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Colors.white70)),
+                          child: Text('SIGN OUT', style: GoogleFonts.outfit(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Colors.black54)),
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -323,12 +385,14 @@ class ProfileView extends GetView<ProfileViewModel> {
     Get.defaultDialog(
       title: 'Delete Account?',
       middleText: 'This action is permanent and cannot be undone.',
-      backgroundColor: const Color(0xFF1A1D25),
-      titleStyle: GoogleFonts.outfit(color: Colors.white),
-      middleTextStyle: GoogleFonts.outfit(color: Colors.white70),
+      backgroundColor: Colors.white,
+      titleStyle: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold),
+      middleTextStyle: GoogleFonts.outfit(color: Colors.black54),
       textConfirm: 'DELETE',
       textCancel: 'CANCEL',
       confirmTextColor: Colors.white,
+      buttonColor: Colors.red[400],
+      cancelTextColor: Colors.black54,
       onConfirm: () => controller.deleteAccount(),
     );
   }
@@ -336,11 +400,21 @@ class ProfileView extends GetView<ProfileViewModel> {
   Widget _buildSectionTitle(String title) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(25.w, 32.h, 25.w, 16.h),
-        child: Text(title, style: GoogleFonts.outfit(fontSize: 11.sp, fontWeight: FontWeight.bold, color: Colors.white24, letterSpacing: 1)),
+        padding: EdgeInsets.fromLTRB(25.w, 28.h, 25.w, 10.h),
+        child: Text(
+          title,
+          style: GoogleFonts.outfit(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black38,
+            letterSpacing: 1.2,
+          ),
+        ),
       ),
     );
   }
+
+  Widget _buildDivider() => Divider(height: 1, indent: 54.w, color: Colors.grey.withOpacity(0.12));
 
   Widget _buildSettingsRow(IconData icon, String title, String subtitle, {VoidCallback? onTap}) {
     return InkWell(
@@ -350,18 +424,26 @@ class ProfileView extends GetView<ProfileViewModel> {
         padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white38, size: 22.sp),
-            SizedBox(width: 16.w),
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: AppColors.accentPurpleBtn.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, color: AppColors.accentPurpleBtn, size: 20.sp),
+            ),
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.w600, color: Colors.white)),
-                  Text(subtitle, style: TextStyle(fontSize: 11.sp, color: Colors.white24)),
+                  Text(title, style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
+                  SizedBox(height: 2.h),
+                  Text(subtitle, style: GoogleFonts.outfit(fontSize: 11.sp, color: Colors.black38)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white12, size: 20.sp),
+            Icon(Icons.chevron_right_rounded, color: Colors.black26, size: 20.sp),
           ],
         ),
       ),

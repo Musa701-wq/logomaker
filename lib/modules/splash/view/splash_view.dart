@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../view_model/splash_view_model.dart';
+import '../../../app/utils/color_constants.dart';
 
 class SplashView extends GetView<SplashViewModel> {
   const SplashView({super.key});
@@ -14,7 +15,7 @@ class SplashView extends GetView<SplashViewModel> {
     Get.put(SplashViewModel());
     
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0D13),
+      backgroundColor: const Color(0xFFF4F4F8),
       body: Stack(
         children: [
           // Background Glow
@@ -26,7 +27,7 @@ class SplashView extends GetView<SplashViewModel> {
                 height: 300.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF7B2FBE).withValues(alpha: 0.08),
+                  color: AppColors.themeGradientStart.withValues(alpha: 0.12),
                 ),
               ),
             ),
@@ -52,17 +53,12 @@ class SplashView extends GetView<SplashViewModel> {
                     width: 100.w,
                     height: 100.w,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7B2FBE), Color(0xFF9D4EDD)],
+                      gradient: LinearGradient(
+                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(28.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF7B2FBE).withOpacity(0.2),
-                          blurRadius: 40,
-                          offset: const Offset(0, 20),
-                        ),
-                      ],
                     ),
                     child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 50.sp),
                   ),
@@ -73,7 +69,7 @@ class SplashView extends GetView<SplashViewModel> {
                   style: GoogleFonts.outfit(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: Colors.black87,
                     letterSpacing: 8,
                   ),
                 ),
@@ -83,7 +79,7 @@ class SplashView extends GetView<SplashViewModel> {
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white38,
+                    color: Colors.black54,
                     letterSpacing: 4,
                   ),
                 ),

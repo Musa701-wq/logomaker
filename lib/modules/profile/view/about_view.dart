@@ -9,15 +9,15 @@ class AboutView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0D13),
+      backgroundColor: const Color(0xFFF4F4F8),
       appBar: AppBar(
         title: Text(
           'About Us',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.black87),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -30,9 +30,16 @@ class AboutView extends StatelessWidget {
               width: 120.w,
               height: 120.w,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1D25),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(30.r),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
               child: Center(
                 child: ClipRRect(
@@ -53,14 +60,14 @@ class AboutView extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black87,
               ),
             ),
             Text(
               'Version 1.0.0',
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
-                color: Colors.white38,
+                color: Colors.black54,
               ),
             ),
             
@@ -85,7 +92,7 @@ class AboutView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: Colors.white24,
+                color: Colors.black54,
               ),
             ),
             SizedBox(height: 40.h),
@@ -100,9 +107,16 @@ class AboutView extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1D25),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(25.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +126,7 @@ class AboutView extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF9D4EDD),
+              color: const Color(0xFF7B2FBE),
             ),
           ),
           SizedBox(height: 12.h),
@@ -120,7 +134,7 @@ class AboutView extends StatelessWidget {
             description,
             style: GoogleFonts.outfit(
               fontSize: 15.sp,
-              color: Colors.white70,
+              color: Colors.black87,
               height: 1.5,
             ),
           ),

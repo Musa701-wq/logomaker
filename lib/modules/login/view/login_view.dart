@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../app/utils/color_constants.dart';
 import '../view_model/login_view_model.dart';
 
 class LoginView extends GetView<LoginViewModel> {
@@ -11,7 +12,7 @@ class LoginView extends GetView<LoginViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0D13),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned(
@@ -27,10 +28,11 @@ class LoginView extends GetView<LoginViewModel> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFF7B2FBE),
-                      Color(0xFF9D4EDD),
-                      Color(0xFF240046),
+                      Color(0xFFFF6EC7), // Bright pink
+                      AppColors.accentPurpleBtn, // Fuchsia
+                      Color(0xFF6D28D9), // Deep violet
                     ],
+                    stops: [0.0, 0.45, 1.0],
                   ),
                 ),
                 child: Column(
@@ -103,7 +105,7 @@ class LoginView extends GetView<LoginViewModel> {
                           style: GoogleFonts.playfairDisplay(
                             fontSize: 34.sp,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: Colors.black87,
                             letterSpacing: -0.5,
                           ),
                         ),
@@ -113,7 +115,7 @@ class LoginView extends GetView<LoginViewModel> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.outfit(
                             fontSize: 15.sp,
-                            color: Colors.white38,
+                            color: Colors.black45,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -127,13 +129,10 @@ class LoginView extends GetView<LoginViewModel> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF7B2FBE).withOpacity(0.3),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
+                              border: Border.all(
+                                color: Colors.grey.withOpacity(0.2),
+                                width: 1.5,
+                              ),
                             ),
                             child: Center(
                               child: controller.isLoading.value
@@ -173,7 +172,7 @@ class LoginView extends GetView<LoginViewModel> {
                               text: 'By continuing, you agree to our ',
                               style: GoogleFonts.outfit(
                                 fontSize: 12.sp,
-                                color: Colors.white24,
+                                color: Colors.black45,
                                 height: 1.5,
                               ),
                               children: [
@@ -193,7 +192,7 @@ class LoginView extends GetView<LoginViewModel> {
                                       'Terms of Service',
                                       style: GoogleFonts.outfit(
                                         fontSize: 12.sp,
-                                        color: const Color(0xFF9D4EDD),
+                                        color: AppColors.themeGradientStart,
                                         fontWeight: FontWeight.w800,
                                         decoration: TextDecoration.underline,
                                       ),
@@ -217,7 +216,7 @@ class LoginView extends GetView<LoginViewModel> {
                                       'Privacy Policy',
                                       style: GoogleFonts.outfit(
                                         fontSize: 12.sp,
-                                        color: const Color(0xFF9D4EDD),
+                                        color: AppColors.themeGradientStart,
                                         fontWeight: FontWeight.w800,
                                         decoration: TextDecoration.underline,
                                       ),

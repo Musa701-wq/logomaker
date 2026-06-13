@@ -19,13 +19,13 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
       appBar: AppBar(
         title: Text(
           'Generation Result',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.black87),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.close_rounded, color: Colors.white, size: 24.sp),
+          icon: Icon(Icons.close_rounded, color: Colors.black87, size: 24.sp),
           onPressed: () => Get.offAllNamed(AppRoutes.home),
         ),
       ),
@@ -49,12 +49,12 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
       width: double.infinity,
       height: 380.h,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1D25),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(40.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 40,
             offset: const Offset(0, 20),
           ),
@@ -70,7 +70,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10),
                 itemBuilder: (context, index) => Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.black.withOpacity(0.05)),
                   ),
                 ),
               ),
@@ -88,7 +88,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
                 borderRadius: BorderRadius.circular(30.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -185,7 +185,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
           style: GoogleFonts.outfit(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: Colors.black87,
           ),
         ),
         SizedBox(height: 8.h),
@@ -196,7 +196,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
             textAlign: TextAlign.center,
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
-              color: Colors.white38,
+              color: Colors.black54,
               height: 1.5,
             ),
           ),

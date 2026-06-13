@@ -10,15 +10,15 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0D13),
+      backgroundColor: const Color(0xFFF4F4F8),
       appBar: AppBar(
         title: Text(
           'Personal Information',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: Colors.black87),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
@@ -81,7 +81,7 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
                 fontSize: 12.sp,
-                color: Colors.white24,
+                color: Colors.black54,
                 height: 1.5,
               ),
             ),
@@ -96,19 +96,26 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1D25),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
+              color: const Color(0xFF7B2FBE).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: const Color(0xFF9D4EDD), size: 20.sp),
+            child: Icon(icon, color: const Color(0xFF7B2FBE), size: 20.sp),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -119,7 +126,7 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
                   label,
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
-                    color: Colors.white38,
+                    color: Colors.black54,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -128,7 +135,7 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
                   value,
                   style: GoogleFonts.outfit(
                     fontSize: 16.sp,
-                    color: Colors.white,
+                    color: Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
