@@ -400,7 +400,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
 
   Widget _buildColorPickerSection(String label, Rx<Color> selectedColor) {
     final List<Color> pickerColors = [
-      Colors.red, Colors.pink, Colors.purple, Colors.deepPurple, Colors.indigo,
+      Colors.red, Colors.teal, const Color(0xFF008080), const Color(0xFF006666), Colors.indigo,
       Colors.blue, Colors.lightBlue, Colors.cyan, Colors.teal, Colors.green,
       Colors.lightGreen, Colors.lime, Colors.yellow, Colors.amber, Colors.orange,
       Colors.deepOrange, Colors.brown, Colors.grey, Colors.blueGrey, Colors.black,
@@ -561,11 +561,11 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
         child: Container(
           height: 60.h,
           decoration: BoxDecoration(
-            color: const Color(0xFF7B2FBE),
+            color: const Color(0xFF008080),
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF7B2FBE).withOpacity(0.3),
+                color: const Color(0xFF008080).withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               )

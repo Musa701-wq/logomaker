@@ -202,9 +202,9 @@ class EditorViewModel extends GetxController {
         fontFamily: 'Oswald',
         fontWeight: FontWeight.w900,
         letterSpacing: 4.0,
-        outlineColor: const Color(0xFF9C6FFF),
+        outlineColor: const Color(0xFF008080),
         outlineWidth: 3.0,
-        glowColor: const Color(0xFF9C6FFF),
+        glowColor: const Color(0xFF008080),
         glowRadius: 10.0,
       );
 

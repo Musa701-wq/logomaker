@@ -24,16 +24,7 @@ class LoginView extends GetView<LoginViewModel> {
               clipper: CustomHeaderClipper(),
               child: Container(
                 decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFFF6EC7), // Bright pink
-                      AppColors.accentPurpleBtn, // Fuchsia
-                      Color(0xFF6D28D9), // Deep violet
-                    ],
-                    stops: [0.0, 0.45, 1.0],
-                  ),
+                  color: Color(0xFF008080),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -192,7 +183,7 @@ class LoginView extends GetView<LoginViewModel> {
                                       'Terms of Service',
                                       style: GoogleFonts.outfit(
                                         fontSize: 12.sp,
-                                        color: AppColors.themeGradientStart,
+                                        color: const Color(0xFF008080),
                                         fontWeight: FontWeight.w800,
                                         decoration: TextDecoration.underline,
                                       ),
@@ -216,7 +207,7 @@ class LoginView extends GetView<LoginViewModel> {
                                       'Privacy Policy',
                                       style: GoogleFonts.outfit(
                                         fontSize: 12.sp,
-                                        color: AppColors.themeGradientStart,
+                                        color: const Color(0xFF008080),
                                         fontWeight: FontWeight.w800,
                                         decoration: TextDecoration.underline,
                                       ),

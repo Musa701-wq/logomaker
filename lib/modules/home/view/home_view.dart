@@ -34,7 +34,7 @@ class HomeView extends GetView<HomeViewModel> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateOptions(),
-        backgroundColor: AppColors.accentPurpleBtn,
+        backgroundColor: const Color(0xFF008080),
         shape: const CircleBorder(),
         elevation: 4,
         child: Icon(Icons.add, color: Colors.white, size: 32.sp),
@@ -87,7 +87,7 @@ class HomeView extends GetView<HomeViewModel> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: AppColors.accentPurpleBtn,
+                    color: const Color(0xFF008080),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
@@ -105,10 +105,10 @@ class HomeView extends GetView<HomeViewModel> {
                 child: Container(
                   padding: EdgeInsets.all(6.w),
                   decoration: BoxDecoration(
-                    color: AppColors.accentPurpleBtn.withOpacity(0.1),
+                    color: const Color(0xFF008080).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.diamond_outlined, color: AppColors.accentPurpleBtn, size: 20.sp),
+                  child: Icon(Icons.diamond_outlined, color: const Color(0xFF008080), size: 20.sp),
                 ),
               ),
           ),
@@ -296,7 +296,7 @@ class HomeView extends GetView<HomeViewModel> {
   Widget _buildNavItem(int index, IconData icon, String label) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
-      final color = isSelected ? AppColors.accentPurpleBtn : Colors.grey.shade400;
+      final color = isSelected ? const Color(0xFF008080) : Colors.grey.shade400;
       return GestureDetector(
         onTap: () => controller.changeIndex(index),
         behavior: HitTestBehavior.opaque,
@@ -363,8 +363,8 @@ class HomeView extends GetView<HomeViewModel> {
                   children: [
                     Container(
                       padding: EdgeInsets.all(12.w),
-                      decoration: BoxDecoration(color: AppColors.themeGradientStart.withOpacity(0.1), shape: BoxShape.circle),
-                      child: Icon(Icons.auto_awesome, color: AppColors.themeGradientStart, size: 24.sp),
+                      decoration: BoxDecoration(color: const Color(0xFF008080).withOpacity(0.1), shape: BoxShape.circle),
+                      child: Icon(Icons.auto_awesome, color: const Color(0xFF008080), size: 24.sp),
                     ),
                     SizedBox(width: 16.w),
                     Expanded(
@@ -399,8 +399,8 @@ class HomeView extends GetView<HomeViewModel> {
                   children: [
                     Container(
                       padding: EdgeInsets.all(12.w),
-                      decoration: BoxDecoration(color: AppColors.themeGradientEnd.withOpacity(0.1), shape: BoxShape.circle),
-                      child: Icon(Icons.edit_rounded, color: AppColors.themeGradientEnd, size: 24.sp),
+                      decoration: BoxDecoration(color: const Color(0xFF008080).withOpacity(0.1), shape: BoxShape.circle),
+                      child: Icon(Icons.edit_rounded, color: const Color(0xFF008080), size: 24.sp),
                     ),
                     SizedBox(width: 16.w),
                     Expanded(
@@ -436,12 +436,8 @@ class HomeView extends GetView<HomeViewModel> {
             Container(
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 28.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+              decoration: const BoxDecoration(
+                color: Color(0xFF008080),
               ),
               child: Column(
                 children: [
@@ -510,7 +506,7 @@ class HomeView extends GetView<HomeViewModel> {
                           Text(
                             'Go Premium',
                             style: GoogleFonts.outfit(
-                              color: AppColors.themeGradientStart,
+                              color: const Color(0xFF008080),
                               fontWeight: FontWeight.bold,
                               fontSize: 14.sp,
                             ),
@@ -610,10 +606,10 @@ class HomeView extends GetView<HomeViewModel> {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: AppColors.accentPurpleBtn.withOpacity(0.08),
+                  color: const Color(0xFF008080).withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(icon, color: AppColors.accentPurpleBtn, size: 20.sp),
+                child: Icon(icon, color: const Color(0xFF008080), size: 20.sp),
               ),
               SizedBox(width: 16.w),
               Text(

@@ -27,7 +27,7 @@ class SplashView extends GetView<SplashViewModel> {
                 height: 300.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.themeGradientStart.withValues(alpha: 0.12),
+                  color: const Color(0xFF008080).withValues(alpha: 0.12),
                 ),
               ),
             ),
@@ -52,13 +52,9 @@ class SplashView extends GetView<SplashViewModel> {
                   child: Container(
                     width: 100.w,
                     height: 100.w,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(28.r),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF008080),
+                      borderRadius: BorderRadius.all(Radius.circular(28)),
                     ),
                     child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 50.sp),
                   ),

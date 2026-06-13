@@ -26,7 +26,7 @@ class AIGeneratorViewModel extends GetxController {
     {'name': 'Default', 'colors': [Colors.grey, Colors.white]},
     {'name': 'Blue & White', 'colors': [Colors.blue, Colors.white]},
     {'name': 'Black & Gold', 'colors': [Colors.black, Colors.amber]},
-    {'name': 'Gradient Purple', 'colors': [Colors.purple, Colors.pinkAccent]},
+    {'name': 'Teal', 'colors': [Colors.teal, const Color(0xFF008080)]},
   ].obs;
 
   // Step 3: Final Touches
@@ -60,7 +60,7 @@ class AIGeneratorViewModel extends GetxController {
     }
   }
 
-  final Rx<Color> tempColor1 = Colors.deepPurple.obs;
+  final Rx<Color> tempColor1 = Colors.teal.obs;
   final Rx<Color> tempColor2 = Colors.blue.obs;
 
   void addCustomColorPalette() {

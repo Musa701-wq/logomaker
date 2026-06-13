@@ -113,7 +113,7 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.primary, AppColors.accentPurple]),
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Row(

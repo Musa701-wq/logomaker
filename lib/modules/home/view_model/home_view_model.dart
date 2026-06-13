@@ -39,8 +39,8 @@ class HomeViewModel extends GetxController {
   final List<Map<String, String>> atelierProjects = [
     {'title': 'Prism Tech', 'time': '2 hours ago', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFF00B4FF'},
     {'title': 'Velvet Noir', 'time': 'Yesterday', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFFFFFFFF'},
-    {'title': 'Bloom Studio', 'time': '3 days ago', 'image': 'assets/images/logo1.jpg', 'textColor': '0xFFFF4D9E'},
-    {'title': 'Cyber Flux', 'time': 'Last week', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFFB06EFF'},
+    {'title': 'Bloom Studio', 'time': '3 days ago', 'image': 'assets/images/logo1.jpg', 'textColor': '0xFF008080'},
+    {'title': 'Cyber Flux', 'time': 'Last week', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFF006666'},
   ];
 
   // Legacy

@@ -28,14 +28,14 @@ class TemplatesViewModel extends GetxController {
       'subtitle': 'RETRO',
       'image': 'assets/images/logo1.jpg',
       'category': 'Retro',
-      'textColor': '0xFFFF4D9E', // pink
+      'textColor': '0xFF008080', // teal
     },
     {
       'title': 'Aurelius Gold',
       'subtitle': 'LUXURY',
       'image': 'assets/images/logo2.jpg',
       'category': 'Luxury',
-      'textColor': '0xFFB06EFF', // purple
+      'textColor': '0xFF006666', // dark teal
     },
     {
       'title': 'Nexus Tech',
@@ -49,14 +49,14 @@ class TemplatesViewModel extends GetxController {
       'subtitle': 'FASHION',
       'image': 'assets/images/logo2.jpg',
       'category': 'Modern',
-      'textColor': '0xFFFF4D9E', // pink
+      'textColor': '0xFF008080', // teal
     },
     {
       'title': 'Cyber Flux',
       'subtitle': 'TECH',
       'image': 'assets/images/logo1.jpg',
       'category': 'Tech',
-      'textColor': '0xFFB06EFF', // purple
+      'textColor': '0xFF006666', // dark teal
     },
     {
       'title': 'Velvet Noir',
@@ -103,7 +103,7 @@ class TemplatesViewModel extends GetxController {
       'Success',
       'Logo added to Templates library!',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF7B2FBE),
+      backgroundColor: const Color(0xFF008080),
       colorText: Colors.white,
     );
   }

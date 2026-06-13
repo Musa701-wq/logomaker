@@ -19,12 +19,7 @@ class CategoryGridView extends StatelessWidget {
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFFF6EC7), AppColors.accentPurpleBtn, Color(0xFF6D28D9)],
-              stops: [0.0, 0.45, 1.0],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: Color(0xFF008080),
           ),
         ),
         backgroundColor: Colors.transparent,

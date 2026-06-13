@@ -36,20 +36,12 @@ class CreditsView extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
       child: Center(
-        child: ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) => LinearGradient(
-            colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ).createShader(bounds),
-          child: Text(
-            'Digital Atelier',
-            style: GoogleFonts.outfit(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+        child: Text(
+          'Digital Atelier',
+          style: GoogleFonts.outfit(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF008080),
           ),
         ),
       ),
@@ -69,8 +61,8 @@ class CreditsView extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.themeGradientStart.withOpacity(0.15),
-                  AppColors.themeGradientEnd.withOpacity(0.05),
+                  const Color(0xFF008080).withOpacity(0.15),
+                  const Color(0xFF008080).withOpacity(0.05),
                   Colors.transparent,
                 ],
               ),
@@ -85,7 +77,7 @@ class CreditsView extends StatelessWidget {
               color: const Color(0xFFF4F4F8),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accentPurpleBtn.withOpacity(0.2),
+                  color: const Color(0xFF008080).withOpacity(0.2),
                   blurRadius: 30,
                   spreadRadius: 2,
                   offset: const Offset(0, 8),
@@ -100,7 +92,7 @@ class CreditsView extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.accentPurpleBtn.withOpacity(0.1),
+                color: const Color(0xFF008080).withOpacity(0.1),
                 width: 1.5,
               ),
             ),
@@ -118,22 +110,16 @@ class CreditsView extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4.h),
-              Obx(() => ShaderMask(
-                    blendMode: BlendMode.srcIn,
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                    ).createShader(bounds),
-                    child: Text(
+              Obx(() => Text(
                       controller.availableCredits.value.toString().replaceAllMapped(
                           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                           (Match m) => '${m[1]},'),
                       style: GoogleFonts.outfit(
                         fontSize: 52.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: const Color(0xFF008080),
                       ),
-                    ),
-                  )),
+                    )),
               Text(
                 'Credits',
                 style: GoogleFonts.outfit(
@@ -178,15 +164,11 @@ class CreditsView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 36.w, vertical: 16.h),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: const Color(0xFF008080),
                 borderRadius: BorderRadius.circular(30.r),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentPurpleBtn.withOpacity(0.35),
+                    color: const Color(0xFF008080).withOpacity(0.35),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -213,19 +195,13 @@ class CreditsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShaderMask(
-            blendMode: BlendMode.srcIn,
-            shaderCallback: (bounds) => LinearGradient(
-              colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-            ).createShader(bounds),
-            child: Text(
-              'THE STORE',
-              style: GoogleFonts.outfit(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.5,
-              ),
+          Text(
+            'THE STORE',
+            style: GoogleFonts.outfit(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF008080),
+              letterSpacing: 1.5,
             ),
           ),
           SizedBox(height: 4.h),
@@ -260,14 +236,14 @@ class CreditsView extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
           color: isPopular
-              ? AppColors.accentPurpleBtn.withOpacity(0.4)
+              ? const Color(0xFF008080).withOpacity(0.4)
               : Colors.grey.withOpacity(0.12),
           width: isPopular ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isPopular
-                ? AppColors.accentPurpleBtn.withOpacity(0.1)
+                ? const Color(0xFF008080).withOpacity(0.1)
                 : Colors.black.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
@@ -295,9 +271,7 @@ class CreditsView extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                          ),
+                          color: const Color(0xFF008080),
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Text(
@@ -316,18 +290,12 @@ class CreditsView extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    ShaderMask(
-                      blendMode: BlendMode.srcIn,
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                      ).createShader(bounds),
-                      child: Text(
-                        plan['credits'],
-                        style: GoogleFonts.outfit(
-                          fontSize: 30.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      plan['credits'],
+                      style: GoogleFonts.outfit(
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF008080),
                       ),
                     ),
                     SizedBox(width: 6.w),
@@ -350,7 +318,7 @@ class CreditsView extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(Icons.check_circle_rounded,
-                              color: AppColors.accentPurpleBtn, size: 15.sp),
+                              color: const Color(0xFF008080), size: 15.sp),
                           SizedBox(width: 8.w),
                           Text(
                             feature,
@@ -371,15 +339,11 @@ class CreditsView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: const Color(0xFF008080),
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentPurpleBtn.withOpacity(0.3),
+                    color: const Color(0xFF008080).withOpacity(0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),

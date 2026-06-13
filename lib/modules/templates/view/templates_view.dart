@@ -93,10 +93,10 @@ class TemplatesView extends GetView<TemplatesViewModel> {
                       margin: EdgeInsets.only(right: 10.w),
                       padding: EdgeInsets.symmetric(horizontal: 22.w),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF7B2FBE) : const Color(0xFF1A1D25),
+                        color: isSelected ? const Color(0xFF008080) : const Color(0xFF1A1D25),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF7B2FBE) : Colors.white.withOpacity(0.05),
+                          color: isSelected ? const Color(0xFF008080) : Colors.white.withOpacity(0.05),
                         ),
                       ),
                       alignment: Alignment.center,

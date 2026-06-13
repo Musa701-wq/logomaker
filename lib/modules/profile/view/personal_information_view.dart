@@ -33,10 +33,10 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
                     height: 120.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF7B2FBE), width: 3),
+                      border: Border.all(color: const Color(0xFF008080), width: 3),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF7B2FBE).withOpacity(0.2),
+                          color: const Color(0xFF008080).withOpacity(0.2),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -112,10 +112,10 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF7B2FBE).withOpacity(0.1),
+              color: const Color(0xFF008080).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: const Color(0xFF7B2FBE), size: 20.sp),
+            child: Icon(icon, color: const Color(0xFF008080), size: 20.sp),
           ),
           SizedBox(width: 16.w),
           Expanded(

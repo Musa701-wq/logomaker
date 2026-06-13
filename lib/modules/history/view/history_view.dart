@@ -14,7 +14,7 @@ class HistoryView extends GetView<HistoryViewModel> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: AppColors.accentPurpleBtn,
+      color: const Color(0xFF008080),
       backgroundColor: Colors.white,
       onRefresh: () => controller.reload(),
       child: CustomScrollView(
@@ -28,20 +28,12 @@ class HistoryView extends GetView<HistoryViewModel> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ShaderMask(
-                      blendMode: BlendMode.srcIn,
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        'The Ethereal Studio',
-                        style: GoogleFonts.outfit(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      'The Ethereal Studio',
+                      style: GoogleFonts.outfit(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF008080),
                       ),
                     ),
                   ],
@@ -58,20 +50,12 @@ class HistoryView extends GetView<HistoryViewModel> {
                         color: Colors.black87,
                       ),
                     ),
-                    ShaderMask(
-                      blendMode: BlendMode.srcIn,
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        'History',
-                        style: GoogleFonts.outfit(
-                          fontSize: 40.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      'History',
+                      style: GoogleFonts.outfit(
+                        fontSize: 40.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF008080),
                       ),
                     ),
                   ],
@@ -152,7 +136,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                   offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: AppColors.themeGradientEnd.withOpacity(0.06),
+                  color: const Color(0xFF008080).withOpacity(0.06),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -167,7 +151,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                   child: Container(
                     height: isTall ? 240.h : 180.h,
                     width: double.infinity,
-                    color: const Color(0xFF2B2E7A),
+                    color: const Color(0xFF004D4D),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -212,7 +196,7 @@ class HistoryView extends GetView<HistoryViewModel> {
                         style: GoogleFonts.outfit(
                           fontSize: 9.sp,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.accentPurpleBtn.withOpacity(0.75),
+                          color: const Color(0xFF008080).withOpacity(0.75),
                           letterSpacing: 0.8,
                         ),
                       ),
@@ -243,22 +227,16 @@ class HistoryView extends GetView<HistoryViewModel> {
                             child: Container(
                               padding: EdgeInsets.all(7.w),
                               decoration: BoxDecoration(
-                                gradient: hasState
-                                    ? LinearGradient(
-                                        colors: [
-                                          AppColors.themeGradientStart.withOpacity(0.15),
-                                          AppColors.themeGradientEnd.withOpacity(0.15),
-                                        ],
-                                      )
-                                    : null,
-                                color: hasState ? null : Colors.grey.withOpacity(0.08),
+                                color: hasState
+                                    ? const Color(0xFF008080).withOpacity(0.15)
+                                    : Colors.grey.withOpacity(0.08),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.edit_rounded,
                                 size: 13.sp,
                                 color: hasState
-                                    ? AppColors.accentPurpleBtn
+                                    ? const Color(0xFF008080)
                                     : Colors.grey[350],
                               ),
                             ),

@@ -27,7 +27,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                 height: 300.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.themeGradientStart.withValues(alpha: 0.18),
+                  color: const Color(0xFF008080).withValues(alpha: 0.18),
                 ),
               ),
             ),
@@ -112,13 +112,11 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                           width: double.infinity,
                           height: 56.h,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                            ),
+                            color: const Color(0xFF008080),
                             borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.accentPurpleBtn.withOpacity(0.3),
+                                color: const Color(0xFF008080).withOpacity(0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -154,7 +152,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
       height: 4.h,
       width: isActive ? 32.w : 8.w,
       decoration: BoxDecoration(
-        color: isActive ? AppColors.accentPurpleBtn : Colors.white12,
+        color: isActive ? const Color(0xFF008080) : Colors.white12,
         borderRadius: BorderRadius.circular(2.r),
       ),
     );

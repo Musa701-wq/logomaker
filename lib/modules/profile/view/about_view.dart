@@ -126,7 +126,7 @@ class AboutView extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF7B2FBE),
+              color: const Color(0xFF008080),
             ),
           ),
           SizedBox(height: 12.h),

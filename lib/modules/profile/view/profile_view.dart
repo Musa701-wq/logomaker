@@ -29,7 +29,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                     ShaderMask(
                       blendMode: BlendMode.srcIn,
                       shaderCallback: (bounds) => LinearGradient(
-                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
+                        colors: [const Color(0xFF008080), const Color(0xFF008080)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ).createShader(bounds),
@@ -45,7 +45,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                     const Spacer(),
                     CircleAvatar(
                       radius: 20.r,
-                      backgroundColor: AppColors.accentPurpleBtn.withOpacity(0.1),
+                      backgroundColor: const Color(0xFF008080).withOpacity(0.1),
                       backgroundImage: const AssetImage('assets/images/logo1.jpg'),
                     ),
                   ],
@@ -60,15 +60,11 @@ class ProfileView extends GetView<ProfileViewModel> {
                 child: Container(
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: const Color(0xFF008080),
                     borderRadius: BorderRadius.circular(30.r),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentPurpleBtn.withOpacity(0.3),
+                        color: const Color(0xFF008080).withOpacity(0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -107,7 +103,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.accentPurpleBtn,
+                                  color: const Color(0xFF008080),
                                 ),
                               ),
                             ),
@@ -147,7 +143,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                             child: Text(
                               'SIGN IN / REGISTER',
                               style: GoogleFonts.outfit(
-                                color: AppColors.accentPurpleBtn,
+                                color: const Color(0xFF008080),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.sp,
                                 letterSpacing: 1,
@@ -225,15 +221,15 @@ class ProfileView extends GetView<ProfileViewModel> {
                               Container(
                                 padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
-                                  color: AppColors.accentPurpleBtn.withOpacity(0.1),
+                                  color: const Color(0xFF008080).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
-                                child: Icon(Icons.subscriptions_rounded, color: AppColors.accentPurpleBtn, size: 20.sp),
+                                child: Icon(Icons.subscriptions_rounded, color: const Color(0xFF008080), size: 20.sp),
                               ),
                               SizedBox(width: 16.w),
                               Text('Subscription Plan', style: GoogleFonts.outfit(fontSize: 17.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
                               const Spacer(),
-                              Text('MANAGE', style: GoogleFonts.outfit(fontSize: 12.sp, fontWeight: FontWeight.bold, color: AppColors.accentPurpleBtn)),
+                              Text('MANAGE', style: GoogleFonts.outfit(fontSize: 12.sp, fontWeight: FontWeight.bold, color: const Color(0xFF008080))),
                             ],
                           ),
                           SizedBox(height: 16.h),
@@ -249,13 +245,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text('Monthly Premium', style: GoogleFonts.outfit(fontSize: 13.sp, color: Colors.black54)),
-                                    ShaderMask(
-                                      blendMode: BlendMode.srcIn,
-                                      shaderCallback: (b) => LinearGradient(
-                                        colors: [AppColors.themeGradientStart, AppColors.themeGradientEnd],
-                                      ).createShader(b),
-                                      child: Text('\$24.99/mo', style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white)),
-                                    ),
+                                    Text('\$24.99/mo', style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color(0xFF008080))),
                                   ],
                                 ),
                                 SizedBox(height: 12.h),
@@ -265,7 +255,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                                     value: 0.75,
                                     minHeight: 6.h,
                                     backgroundColor: Colors.grey.withOpacity(0.15),
-                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accentPurpleBtn),
+                                    valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF008080)),
                                   ),
                                 ),
                               ],
@@ -427,10 +417,10 @@ class ProfileView extends GetView<ProfileViewModel> {
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: AppColors.accentPurpleBtn.withOpacity(0.08),
+                color: const Color(0xFF008080).withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10.r),
               ),
-              child: Icon(icon, color: AppColors.accentPurpleBtn, size: 20.sp),
+              child: Icon(icon, color: const Color(0xFF008080), size: 20.sp),
             ),
             SizedBox(width: 14.w),
             Expanded(

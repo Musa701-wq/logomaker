@@ -45,12 +45,12 @@ class NotificationsView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF7B2FBE).withOpacity(0.1),
+              color: const Color(0xFF008080).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               data['type'] == 'promo' ? Icons.local_offer_outlined : Icons.notifications_active_outlined,
-              color: const Color(0xFF9D4EDD),
+              color: const Color(0xFF006666),
               size: 20.sp,
             ),
           ),
