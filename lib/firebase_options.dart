@@ -50,20 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBMQAL69hlbGgWK6MCDBKNQzECczZenENk',
-    appId: '1:955777504028:android:597b1a71a81f01c57060d9',
-    messagingSenderId: '955777504028',
-    projectId: 'logomaker-6d294',
-    storageBucket: 'logomaker-6d294.firebasestorage.app',
+    apiKey: 'AIzaSyA5QBrgiQXyx8rRjf-TDSbuHCdBj8Yaxv0',
+    appId: '1:517082423908:android:8048bb859bad0231e4b571',
+    messagingSenderId: '517082423908',
+    projectId: 'logo-creation-13cea',
+    storageBucket: 'logo-creation-13cea.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAny2s2PlV4iU1QCHxAVGBVM92edcvqr4Q',
-    appId: '1:955777504028:ios:aafee1cfff9f30e47060d9',
-    messagingSenderId: '955777504028',
-    projectId: 'logomaker-6d294',
-    storageBucket: 'logomaker-6d294.firebasestorage.app',
-    iosClientId: '955777504028-e3odpc113reruesjoog8g37lao4e294r.apps.googleusercontent.com',
-    iosBundleId: 'com.example.untitled1',
+    apiKey: 'AIzaSyCTcKEGZu_mfTY6dtfPNzJjY6BjplXMqLU',
+    appId: '1:517082423908:ios:92e55ec5b317741ae4b571',
+    messagingSenderId: '517082423908',
+    projectId: 'logo-creation-13cea',
+    storageBucket: 'logo-creation-13cea.firebasestorage.app',
+    iosClientId: '517082423908-gabl2j7utq8ov91ogeopam5u49sqh456.apps.googleusercontent.com',
+    iosBundleId: 'com.musaf.app',
   );
 }

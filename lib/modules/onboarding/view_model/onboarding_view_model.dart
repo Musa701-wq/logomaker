@@ -25,7 +25,7 @@ class OnboardingViewModel extends GetxController {
   Future<void> completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isFirstTime', false);
-    Get.offAllNamed(AppRoutes.home);
+    Get.offAllNamed(AppRoutes.welcomeBanner);
   }
 
   void skip() {

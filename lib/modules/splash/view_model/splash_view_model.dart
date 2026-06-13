@@ -18,13 +18,15 @@ class SplashViewModel extends GetxController {
     final user = FirebaseAuth.instance.currentUser;
     final prefs = await SharedPreferences.getInstance();
     final isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    final hasSeenBanner = prefs.getBool('hasSeenWelcomeBanner') ?? false;
 
     if (user != null) {
       Get.offAllNamed(AppRoutes.home);
     } else if (isFirstTime) {
       Get.offAllNamed(AppRoutes.onboarding);
+    } else if (!hasSeenBanner) {
+      Get.offAllNamed(AppRoutes.welcomeBanner);
     } else {
-      // Go to Home as Guest
       Get.offAllNamed(AppRoutes.home);
     }
   }
