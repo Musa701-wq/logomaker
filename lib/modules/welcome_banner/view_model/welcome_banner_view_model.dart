@@ -1,11 +1,19 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../../../app/data/subscription_data.dart';
+import '../../../app/models/subscription_plan.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../app/services/purchase_service.dart';
 
 class WelcomeBannerViewModel extends GetxController {
+  final PurchaseService _purchaseService = PurchaseService.to;
+
   var isAnimating = false.obs;
+  var selectedPlanIndex = 1.obs;
+
+  RxBool get isPurchasing => _purchaseService.isPurchasing;
+
+  List<SubscriptionPlan> get plans => SubscriptionData.plans;
 
   @override
   void onInit() {
@@ -21,20 +29,8 @@ class WelcomeBannerViewModel extends GetxController {
     Get.offAllNamed(AppRoutes.home);
   }
 
-  Future<void> onBuyNow() async {
-    final url = Uri.parse('https://logomaker-6d294.web.app/pricing.html');
-    try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Could not open purchase page',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
-        colorText: Colors.red,
-      );
-    }
+  Future<void> onSubscribe(int index) async {
+    final plan = plans[index];
+    await _purchaseService.purchasePlan(plan);
   }
 }

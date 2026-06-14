@@ -28,7 +28,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
         child: SafeArea(
           child: Stack(
             children: [
-              // Background decorative elements
               Positioned(
                 top: -60.h,
                 right: -40.w,
@@ -40,7 +39,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                 child: _buildBlurCircle(280.w, Colors.white.withValues(alpha: 0.06)),
               ),
 
-              // Content
               Obx(() => AnimatedOpacity(
                 opacity: controller.isAnimating.value ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 600),
@@ -48,7 +46,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                   children: [
                     SizedBox(height: 24.h),
 
-                    // Skip button
                     _buildAnimatedItem(
                       delay: 0,
                       child: Align(
@@ -79,7 +76,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                             children: [
                               SizedBox(height: 20.h),
 
-                              // Limited badge
                               _buildAnimatedItem(
                                 delay: 200,
                                 child: Container(
@@ -106,12 +102,11 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
 
                               SizedBox(height: 24.h),
 
-                              // Product image card
                               _buildAnimatedItem(
                                 delay: 400,
                                 child: Container(
                                   width: double.infinity,
-                                  height: 320.h,
+                                  height: 240.h,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(32.r),
                                     boxShadow: [
@@ -127,7 +122,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                     child: Stack(
                                       fit: StackFit.expand,
                                       children: [
-                                        // Teal gradient background for product
                                         Container(
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
@@ -141,7 +135,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                             ),
                                           ),
                                         ),
-                                        // Grid pattern overlay
                                         Positioned.fill(
                                           child: Opacity(
                                             opacity: 0.08,
@@ -150,7 +143,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                             ),
                                           ),
                                         ),
-                                        // Shine effect
                                         Positioned(
                                           top: -40.h,
                                           right: -30.w,
@@ -168,7 +160,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                             ),
                                           ),
                                         ),
-                                        // Central logo/product display
                                         Center(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
@@ -213,7 +204,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                             ],
                                           ),
                                         ),
-                                        // Bottom fade
                                         Positioned(
                                           bottom: 0,
                                           left: 0,
@@ -240,7 +230,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
 
                               SizedBox(height: 28.h),
 
-                              // Title
                               _buildAnimatedItem(
                                 delay: 600,
                                 child: Text(
@@ -257,11 +246,10 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
 
                               SizedBox(height: 12.h),
 
-                              // Description
                               _buildAnimatedItem(
                                 delay: 700,
                                 child: Text(
-                                  'Get access to all premium templates, AI tools, and HD exports with our Pro plan.',
+                                  'Choose your plan and start creating today.',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.outfit(
                                     fontSize: 13.sp,
@@ -272,98 +260,205 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                 ),
                               ),
 
-                              SizedBox(height: 28.h),
+                              SizedBox(height: 24.h),
 
-                              // Features
                               _buildAnimatedItem(
                                 delay: 800,
-                                child: Container(
-                                  padding: EdgeInsets.all(20.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.08),
-                                    borderRadius: BorderRadius.circular(20.r),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.1),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      _buildFeatureRow(Icons.check_circle_rounded, '500+ Premium Templates'),
-                                      SizedBox(height: 14.h),
-                                      _buildFeatureRow(Icons.check_circle_rounded, 'AI Logo Generation'),
-                                      SizedBox(height: 14.h),
-                                      _buildFeatureRow(Icons.check_circle_rounded, 'Remove Background'),
-                                      SizedBox(height: 14.h),
-                                      _buildFeatureRow(Icons.check_circle_rounded, 'HD Export & Commercial Use'),
-                                    ],
-                                  ),
-                                ),
+                                child: Obx(() => Row(
+                                  children: controller.plans.asMap().entries.map((entry) {
+                                    final index = entry.key;
+                                    final plan = entry.value;
+                                    final isSelected = controller.selectedPlanIndex.value == index;
+                                    final Color accentColor = Color(plan.color);
+                                    return Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => controller.selectedPlanIndex.value = index,
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Colors.white.withValues(alpha: 0.15)
+                                                : Colors.white.withValues(alpha: 0.05),
+                                            borderRadius: BorderRadius.circular(16.r),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? accentColor.withValues(alpha: 0.6)
+                                                  : Colors.white.withValues(alpha: 0.1),
+                                              width: isSelected ? 2 : 1,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              if (plan.isPopular)
+                                                Container(
+                                                  margin: EdgeInsets.only(bottom: 6.h),
+                                                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                                  decoration: BoxDecoration(
+                                                    color: accentColor,
+                                                    borderRadius: BorderRadius.circular(4.r),
+                                                  ),
+                                                  child: Text(
+                                                    'BEST',
+                                                    style: GoogleFonts.outfit(
+                                                      fontSize: 7.sp,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                )
+                                              else
+                                                SizedBox(height: 14.h),
+                                              Text(
+                                                plan.title,
+                                                style: GoogleFonts.outfit(
+                                                  fontSize: 13.sp,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4.h),
+                                              Text(
+                                                plan.price,
+                                                style: GoogleFonts.outfit(
+                                                  fontSize: 20.sp,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: isSelected ? accentColor : Colors.white,
+                                                ),
+                                              ),
+                                              Text(
+                                                plan.period,
+                                                style: GoogleFonts.outfit(
+                                                  fontSize: 9.sp,
+                                                  color: Colors.white.withValues(alpha: 0.5),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                )),
                               ),
 
-                              SizedBox(height: 32.h),
+                              SizedBox(height: 20.h),
 
-                              // Buy button
+                              _buildAnimatedItem(
+                                delay: 900,
+                                child: Obx(() {
+                                  final plan = controller.plans[controller.selectedPlanIndex.value];
+                                  final Color accentColor = Color(plan.color);
+                                  return Container(
+                                    padding: EdgeInsets.all(16.w),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(16.r),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.1),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: plan.features.map((f) => Padding(
+                                        padding: EdgeInsets.only(bottom: 8.h),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.check_circle_rounded,
+                                                color: accentColor, size: 16.sp),
+                                            SizedBox(width: 10.w),
+                                            Text(
+                                              f,
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 13.sp,
+                                                color: Colors.white.withValues(alpha: 0.9),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )).toList(),
+                                    ),
+                                  );
+                                }),
+                              ),
+
+                              SizedBox(height: 24.h),
+
                               _buildAnimatedItem(
                                 delay: 1000,
-                                child: GestureDetector(
-                                  onTap: controller.onBuyNow,
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 62.h,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.amber.shade600,
-                                          Colors.orange.shade700,
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.amber.withValues(alpha: 0.4),
-                                          blurRadius: 25,
-                                          offset: const Offset(0, 8),
+                                child: Obx(() {
+                                  final plan = controller.plans[controller.selectedPlanIndex.value];
+                                  final Color accentColor = Color(plan.color);
+                                  final bool loading = controller.isPurchasing.value;
+                                  return GestureDetector(
+                                    onTap: loading ? null : () => controller.onSubscribe(controller.selectedPlanIndex.value),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 62.h,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            accentColor,
+                                            accentColor.withValues(alpha: 0.8),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.bolt_rounded,
-                                            color: Colors.white,
-                                            size: 24.sp,
-                                          ),
-                                          SizedBox(width: 8.w),
-                                          Text(
-                                            'BUY NOW — ',
-                                            style: GoogleFonts.outfit(
-                                              fontSize: 17.sp,
-                                              fontWeight: FontWeight.w800,
-                                              color: Colors.white,
-                                              letterSpacing: 2,
-                                            ),
-                                          ),
-                                          Text(
-                                            '\$29.99',
-                                            style: GoogleFonts.outfit(
-                                              fontSize: 20.sp,
-                                              fontWeight: FontWeight.w900,
-                                              color: Colors.white,
-                                            ),
+                                        borderRadius: BorderRadius.circular(20.r),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: accentColor.withValues(alpha: 0.4),
+                                            blurRadius: 25,
+                                            offset: const Offset(0, 8),
                                           ),
                                         ],
                                       ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            if (loading)
+                                              SizedBox(
+                                                width: 22.sp,
+                                                height: 22.sp,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2.5,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            else
+                                              Icon(
+                                                Icons.bolt_rounded,
+                                                color: Colors.white,
+                                                size: 24.sp,
+                                              ),
+                                            SizedBox(width: 8.w),
+                                            Text(
+                                              loading ? 'Processing...' : 'SUBSCRIBE — ',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 17.sp,
+                                                fontWeight: FontWeight.w800,
+                                                color: Colors.white,
+                                                letterSpacing: 2,
+                                              ),
+                                            ),
+                                            if (!loading)
+                                              Text(
+                                                '${plan.price}${plan.period}',
+                                                style: GoogleFonts.outfit(
+                                                  fontSize: 20.sp,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                }),
                               ),
 
                               SizedBox(height: 12.h),
 
-                              // No thanks
                               _buildAnimatedItem(
                                 delay: 1100,
                                 child: GestureDetector(
@@ -425,23 +520,6 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
         duration: Duration(milliseconds: 500 + delay),
         child: child,
       ),
-    );
-  }
-
-  Widget _buildFeatureRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.teal.shade200, size: 20.sp),
-        SizedBox(width: 12.w),
-        Text(
-          text,
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
-        ),
-      ],
     );
   }
 }

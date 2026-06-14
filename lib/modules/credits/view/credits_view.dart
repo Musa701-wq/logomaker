@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../app/utils/color_constants.dart';
+import '../../../app/models/subscription_plan.dart';
 import '../view_model/credits_view_model.dart';
 
-class CreditsView extends StatelessWidget {
+class CreditsView extends GetView<CreditsViewModel> {
   const CreditsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreditsViewModel());
-
+    Get.put(CreditsViewModel());
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F8),
       body: SingleChildScrollView(
@@ -20,11 +19,11 @@ class CreditsView extends StatelessWidget {
           children: [
             _buildHeader(),
             SizedBox(height: 20.h),
-            _buildCreditsCircle(controller),
+            _buildSubscriptionCard(),
             SizedBox(height: 30.h),
             _buildCreativeCapitalSection(),
             SizedBox(height: 40.h),
-            _buildStoreSection(controller),
+            _buildPlansSection(),
             SizedBox(height: 100.h),
           ],
         ),
@@ -48,12 +47,11 @@ class CreditsView extends StatelessWidget {
     );
   }
 
-  Widget _buildCreditsCircle(CreditsViewModel controller) {
+  Widget _buildSubscriptionCard() {
     return Center(
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Outer glow ring
           Container(
             width: 250.w,
             height: 250.w,
@@ -61,14 +59,13 @@ class CreditsView extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF008080).withOpacity(0.15),
-                  const Color(0xFF008080).withOpacity(0.05),
+                  const Color(0xFF008080).withValues(alpha: 0.15),
+                  const Color(0xFF008080).withValues(alpha: 0.05),
                   Colors.transparent,
                 ],
               ),
             ),
           ),
-          // White Circle with gradient border
           Container(
             width: 220.w,
             height: 220.w,
@@ -77,7 +74,7 @@ class CreditsView extends StatelessWidget {
               color: const Color(0xFFF4F4F8),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF008080).withOpacity(0.2),
+                  color: const Color(0xFF008080).withValues(alpha: 0.2),
                   blurRadius: 30,
                   spreadRadius: 2,
                   offset: const Offset(0, 8),
@@ -85,51 +82,72 @@ class CreditsView extends StatelessWidget {
               ],
             ),
           ),
-          // Inner ring accent
           Container(
             width: 195.w,
             height: 195.w,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: const Color(0xFF008080).withOpacity(0.1),
+                color: const Color(0xFF008080).withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'AVAILABLE',
-                style: GoogleFonts.outfit(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black38,
-                  letterSpacing: 1.5,
+          Obx(() {
+            if (controller.isSubscribed.value) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.verified_rounded,
+                      color: const Color(0xFF008080), size: 28.sp),
+                  SizedBox(height: 6.h),
+                  Text(
+                    'SUBSCRIBED',
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black38,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    controller.activePlanTitle.value,
+                    style: GoogleFonts.outfit(
+                      fontSize: 26.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF008080),
+                    ),
+                  ),
+                  Text(
+                    'Expires ${controller.expiryDate.value}',
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      color: Colors.black45,
+                    ),
+                  ),
+                ],
+              );
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.subscriptions_outlined,
+                    color: Colors.black26, size: 28.sp),
+                SizedBox(height: 6.h),
+                Text(
+                  'NOT SUBSCRIBED',
+                  style: GoogleFonts.outfit(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black38,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ),
-              SizedBox(height: 4.h),
-              Obx(() => Text(
-                      controller.availableCredits.value.toString().replaceAllMapped(
-                          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                          (Match m) => '${m[1]},'),
-                      style: GoogleFonts.outfit(
-                        fontSize: 52.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF008080),
-                      ),
-                    )),
-              Text(
-                'Credits',
-                style: GoogleFonts.outfit(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black54,
-                ),
-              ),
-            ],
-          ),
+                SizedBox(height: 6.h),
+              ],
+            );
+          }),
         ],
       ),
     );
@@ -141,7 +159,7 @@ class CreditsView extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your Creative Capital',
+            'Your Subscription',
             style: GoogleFonts.outfit(
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
@@ -150,7 +168,7 @@ class CreditsView extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           Text(
-            'Power your imagination with the Digital Atelier\'s credit system. Every generation is a step toward your masterpiece.',
+            'Subscribe to unlock unlimited logo designs and premium tools.',
             textAlign: TextAlign.center,
             style: GoogleFonts.outfit(
               fontSize: 14.sp,
@@ -168,7 +186,7 @@ class CreditsView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF008080).withOpacity(0.35),
+                    color: const Color(0xFF008080).withValues(alpha: 0.35),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -189,14 +207,14 @@ class CreditsView extends StatelessWidget {
     );
   }
 
-  Widget _buildStoreSection(CreditsViewModel controller) {
+  Widget _buildPlansSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'THE STORE',
+            'PLANS',
             style: GoogleFonts.outfit(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
@@ -206,7 +224,7 @@ class CreditsView extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            'Quick Top-up',
+            'Choose Your Plan',
             style: GoogleFonts.outfit(
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
@@ -214,18 +232,18 @@ class CreditsView extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          ...controller.topUpPlans.asMap().entries.map((entry) {
+          ...controller.plans.asMap().entries.map((entry) {
             final index = entry.key;
             final plan = entry.value;
-            return _buildPlanCard(plan, () => controller.buyPlan(index));
+            return _buildPlanCard(plan, index);
           }),
         ],
       ),
     );
   }
 
-  Widget _buildPlanCard(Map<String, dynamic> plan, VoidCallback onTap) {
-    final bool isPopular = plan['isPopular'] ?? false;
+  Widget _buildPlanCard(SubscriptionPlan plan, int index) {
+    final Color accentColor = Color(plan.color);
 
     return Container(
       width: double.infinity,
@@ -235,16 +253,16 @@ class CreditsView extends StatelessWidget {
         color: const Color(0xFFF4F4F8),
         borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: isPopular
-              ? const Color(0xFF008080).withOpacity(0.4)
-              : Colors.grey.withOpacity(0.12),
-          width: isPopular ? 2 : 1,
+          color: plan.isPopular
+              ? accentColor.withValues(alpha: 0.4)
+              : Colors.grey.withValues(alpha: 0.12),
+          width: plan.isPopular ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: isPopular
-                ? const Color(0xFF008080).withOpacity(0.1)
-                : Colors.black.withOpacity(0.04),
+            color: plan.isPopular
+                ? accentColor.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -259,19 +277,19 @@ class CreditsView extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      plan['title'],
+                      plan.title,
                       style: GoogleFonts.outfit(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
-                    if (isPopular) ...[
+                    if (plan.isPopular) ...[
                       SizedBox(width: 8.w),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF008080),
+                          color: accentColor,
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Text(
@@ -291,18 +309,18 @@ class CreditsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      plan['credits'],
+                      plan.price,
                       style: GoogleFonts.outfit(
                         fontSize: 30.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF008080),
+                        color: accentColor,
                       ),
                     ),
                     SizedBox(width: 6.w),
                     Padding(
                       padding: EdgeInsets.only(bottom: 5.h),
                       child: Text(
-                        'CREDITS',
+                        plan.period,
                         style: GoogleFonts.outfit(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
@@ -312,13 +330,22 @@ class CreditsView extends StatelessWidget {
                     ),
                   ],
                 ),
+                SizedBox(height: 6.h),
+                Text(
+                  'ID: ${plan.productId}',
+                  style: GoogleFonts.outfit(
+                    fontSize: 9.sp,
+                    color: Colors.black26,
+                    letterSpacing: 0.3,
+                  ),
+                ),
                 SizedBox(height: 14.h),
-                ...(plan['features'] as List<String>).map((feature) => Padding(
+                ...plan.features.map((feature) => Padding(
                       padding: EdgeInsets.only(bottom: 6.h),
                       child: Row(
                         children: [
                           Icon(Icons.check_circle_rounded,
-                              color: const Color(0xFF008080), size: 15.sp),
+                              color: accentColor, size: 15.sp),
                           SizedBox(width: 8.w),
                           Text(
                             feature,
@@ -335,28 +362,28 @@ class CreditsView extends StatelessWidget {
           ),
           SizedBox(width: 16.w),
           GestureDetector(
-            onTap: onTap,
+            onTap: () => controller.subscribe(index),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
               decoration: BoxDecoration(
-                color: const Color(0xFF008080),
+                color: accentColor,
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF008080).withOpacity(0.3),
+                    color: accentColor.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: Text(
-                plan['price'],
+              child: Obx(() => Text(
+                controller.isPurchasing.value ? 'Processing...' : 'Subscribe',
                 style: GoogleFonts.outfit(
-                  fontSize: 16.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
-              ),
+              )),
             ),
           ),
         ],

@@ -1,38 +1,31 @@
 import 'package:get/get.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import '../../../app/data/subscription_data.dart';
+import '../../../app/models/subscription_plan.dart';
+import '../../../app/services/purchase_service.dart';
 
 class CreditsViewModel extends GetxController {
-  final RxInt availableCredits = 1250.obs;
+  final PurchaseService _purchaseService = PurchaseService.to;
 
-  final List<Map<String, dynamic>> topUpPlans = [
-    {
-      'title': 'Starter',
-      'credits': '100',
-      'price': '\$9.99',
-      'features': ['10 Generations', 'Standard Quality'],
-      'isPopular': false,
-    },
-    {
-      'title': 'Creator',
-      'credits': '600',
-      'price': '\$49.99',
-      'features': ['65 Generations', 'High-res Export'],
-      'isPopular': true,
-    },
-    {
-      'title': 'Studio',
-      'credits': '1500',
-      'price': '\$99.99',
-      'features': ['Unlimited Drafts', '4K Rendering'],
-      'isPopular': false,
-    },
-  ];
+  RxBool get isSubscribed => _purchaseService.isSubscribed;
+  RxString get activePlanTitle => _purchaseService.activePlanTitle;
+  RxString get expiryDate => _purchaseService.expiryDate;
+  RxString get subscribedPlanId => _purchaseService.subscribedPlanId;
+  RxBool get isLoadingProducts => _purchaseService.isLoadingProducts;
+  RxBool get isPurchasing => _purchaseService.isPurchasing;
 
-  void buyPlan(int index) {
-    // Placeholder for payment logic
-    Get.snackbar(
-      'Payment',
-      'Redirecting to payment gateway for ${topUpPlans[index]['title']} plan...',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+  List<SubscriptionPlan> get plans => SubscriptionData.plans;
+
+  ProductDetails? getProductDetails(SubscriptionPlan plan) {
+    return _purchaseService.getProductDetails(plan.productId);
+  }
+
+  Future<void> subscribe(int index) async {
+    final plan = plans[index];
+    await _purchaseService.purchasePlan(plan);
+  }
+
+  Future<void> restorePurchases() async {
+    await _purchaseService.restorePurchases();
   }
 }
