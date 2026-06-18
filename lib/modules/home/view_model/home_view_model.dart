@@ -1,11 +1,49 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../app/routes/app_routes.dart';
+import 'package:flutter/foundation.dart';
+import '../../../app/services/storage_service.dart';
+
+class FolderSection {
+  final String category;
+  final String storagePrefix;
+  final List<String> folders;
+  const FolderSection(this.category, this.storagePrefix, this.folders);
+}
 
 class HomeViewModel extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? get currentUser => _auth.currentUser;
   final RxInt selectedIndex = 0.obs;
   final RxBool isGuest = true.obs;
+  final RxBool isLoading = true.obs;
+
+  final RxMap<String, List<Map<String, String>>> folderData =
+      <String, List<Map<String, String>>>{}.obs;
+
+  final RxString searchQuery = ''.obs;
+  final RxBool isSearching = false.obs;
+
+  List<String> get searchSuggestions {
+    if (searchQuery.isEmpty) return [];
+    final q = searchQuery.toLowerCase();
+    return allSections
+        .expand((s) => s.folders)
+        .where((f) => f.toLowerCase().contains(q))
+        .toList();
+  }
+
+  final RxList<FolderSection> sections = <FolderSection>[].obs;
+
+  static const List<FolderSection> allSections = [
+    FolderSection('Logos', 'musaf/logo', [
+      'abstract', 'animals', 'butterfly', 'camera', 'car', 'circle', 'corporal',
+      'dog', 'farmer', 'festival', 'field', 'flowers', 'fly', 'functions',
+      'games', 'hallowean', 'heart', 'holiday', 'leaf', 'music', 'ngo',
+      'party', 'profession', 'restaurant', 'simple', 'social', 'spots',
+      'square', 'star', 'text', 'tools', 'toy', 'video',
+    ]),
+  ];
 
   @override
   void onInit() {
@@ -13,38 +51,52 @@ class HomeViewModel extends GetxController {
     _auth.authStateChanges().listen((user) {
       checkLoginStatus();
     });
+    sections.value = allSections;
+    loadAllFolders();
   }
 
   void checkLoginStatus() {
     isGuest.value = _auth.currentUser == null;
   }
 
-  void onCreateNewLogo() {
-    if (isGuest.value) {
-      Get.toNamed(AppRoutes.login);
-    } else {
-      Get.toNamed(AppRoutes.aiGenerator);
-    }
-  }
-
   void changeIndex(int index) {
     selectedIndex.value = index;
   }
 
-  // Style categories for "Start from a vision"
-  final List<String> styleCategories = ['Minimalist', 'Abstract', 'Typography', 'Gaming', 'Luxury'];
-  final RxString selectedStyle = 'Minimalist'.obs;
+  Future<void> loadAllFolders() async {
+    isLoading.value = true;
+      for (final section in allSections) {
+      for (final folderName in section.folders) {
+        final path = '${section.storagePrefix}/$folderName';
+        folderData[folderName] = [];
+        await StorageService.getImagesOneByOne(
+          path,
+          limit: 10,
+          onUrl: (url) {
+            folderData[folderName] = [
+              ...folderData[folderName] ?? [],
+              {'title': folderName, 'image': url, 'textColor': '0xFFFFFFFF'},
+            ];
+          },
+        );
+        if (isLoading.value) isLoading.value = false;
+      }
+    }
+    isLoading.value = false;
+  }
 
-  // Your Atelier - recent projects (placeholder data)
-  final List<Map<String, String>> atelierProjects = [
-    {'title': 'Prism Tech', 'time': '2 hours ago', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFF00B4FF'},
-    {'title': 'Velvet Noir', 'time': 'Yesterday', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFFFFFFFF'},
-    {'title': 'Bloom Studio', 'time': '3 days ago', 'image': 'assets/images/logo1.jpg', 'textColor': '0xFF008080'},
-    {'title': 'Cyber Flux', 'time': 'Last week', 'image': 'assets/images/logo2.jpg', 'textColor': '0xFF006666'},
-  ];
-
-  // Legacy
-  final List<String> categories = ['Modern', 'Serif', 'Minimal'];
-  final RxString selectedCategory = 'Modern'.obs;
-  void selectCategory(String category) => selectedCategory.value = category;
+  Future<List<Map<String, String>>> getAllImagesFromFolder(
+      String fullPath) async {
+    try {
+      final urls = await StorageService.getImagesFromFolder(fullPath);
+      final name = fullPath.split('/').last;
+      return urls.map((url) => ({
+            'title': name,
+            'image': url,
+            'textColor': '0xFFFFFFFF',
+          })).toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

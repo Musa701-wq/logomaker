@@ -13,7 +13,7 @@ class WelcomeBannerViewModel extends GetxController {
 
   RxBool get isPurchasing => _purchaseService.isPurchasing;
 
-  List<SubscriptionPlan> get plans => SubscriptionData.plans;
+  List<SubscriptionPlan> get plans => SubscriptionData.to.plans;
 
   @override
   void onInit() {

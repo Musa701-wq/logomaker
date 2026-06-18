@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +12,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0D13), // Deep Premium Dark
+      backgroundColor: AppColors.scaffoldBackground,
       body: Stack(
         children: [
           // Background Glows
@@ -27,7 +26,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                 height: 300.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF008080).withValues(alpha: 0.18),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -47,7 +46,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                         style: GoogleFonts.outfit(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: AppColors.primary,
                           letterSpacing: 2,
                         ),
                       ),
@@ -58,7 +57,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                           style: GoogleFonts.outfit(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white38,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -75,20 +74,20 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                     children: [
                       _buildPage(
                         index: 0,
-                        title: 'Precision Tools\nfor Modern Design.',
-                        subtitle: 'Experience professional-grade control\nin the palm of your hand.',
+                        title: 'Design Logos\nwith Ease.',
+                        subtitle: 'Professional-grade editing tools\nright at your fingertips.',
                         imagePath: 'assets/images/logo1.jpg',
                       ),
                       _buildPage(
                         index: 1,
-                        title: 'AI Assisted\nCreative Studio.',
-                        subtitle: 'Generate inspiration instantly with our\nneural creative engine.',
+                        title: 'Customize\nEvery Detail.',
+                        subtitle: 'Add text, shapes, and images.\nChange colors, fonts, and more.',
                         imagePath: 'assets/images/logo2.jpg',
                       ),
                       _buildPage(
                         index: 2,
-                        title: 'Elevate Your\nBrand Identity.',
-                        subtitle: 'Join a community of thousands of\nprofessional creators today.',
+                        title: 'Export &\nShare Anywhere.',
+                        subtitle: 'Save your designs to your device\nor share them with the world.',
                         imagePath: 'assets/images/logo1.jpg',
                       ),
                     ],
@@ -112,11 +111,11 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                           width: double.infinity,
                           height: 56.h,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF008080),
+                            color: AppColors.primary,
                             borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF008080).withOpacity(0.3),
+                                color: AppColors.primary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -152,7 +151,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
       height: 4.h,
       width: isActive ? 32.w : 8.w,
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF008080) : Colors.white12,
+        color: isActive ? AppColors.primary : AppColors.dividerColor,
         borderRadius: BorderRadius.circular(2.r),
       ),
     );
@@ -171,12 +170,13 @@ class OnboardingView extends GetView<OnboardingViewModel> {
         Container(
           height: 320.h,
           width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 24.w),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32.r),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 30,
                 offset: const Offset(0, 15),
               ),
@@ -191,25 +191,31 @@ class OnboardingView extends GetView<OnboardingViewModel> {
           ),
         ),
         SizedBox(height: 32.h),
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.outfit(
-            fontSize: 28.sp,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            height: 1.1,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.outfit(
+              fontSize: 28.sp,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+              height: 1.1,
+            ),
           ),
         ),
         SizedBox(height: 16.h),
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w400,
-            color: Colors.white38,
-            height: 1.5,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.outfit(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
           ),
         ),
       ],

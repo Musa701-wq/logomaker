@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
+import '../../../app/services/storage_service.dart';
 import '../../../app/utils/color_constants.dart';
 import '../../../models/editor_element.dart';
 import '../view_model/editor_view_model.dart';
@@ -292,8 +293,11 @@ class EditorView extends GetView<EditorViewModel> {
                   controller: controller.screenshotController,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: controller.backgroundColor.value,
+                      color: controller.backgroundImageUrl.value != null ? null : controller.backgroundColor.value,
                       gradient: controller.backgroundGradient.value != null ? LinearGradient(colors: controller.backgroundGradient.value!) : null,
+                      image: controller.backgroundImageUrl.value != null
+                          ? DecorationImage(image: NetworkImage(controller.backgroundImageUrl.value!), fit: BoxFit.cover)
+                          : null,
                     ),
                     child: Stack(
                       children: [
@@ -400,7 +404,17 @@ class EditorView extends GetView<EditorViewModel> {
       // Base image
       Widget img = element.content.startsWith('assets/')
           ? Image.asset(element.content, fit: BoxFit.contain, width: imgWidth)
-          : Image.file(File(element.content), fit: BoxFit.contain, width: imgWidth);
+          : element.content.startsWith('http')
+              ? Image.network(element.content, fit: BoxFit.contain, width: imgWidth)
+              : Image.file(File(element.content), fit: BoxFit.contain, width: imgWidth);
+
+      // Apply shape color tint if set
+      if (element.color != null) {
+        img = ColorFiltered(
+          colorFilter: ColorFilter.mode(element.color!, BlendMode.srcIn),
+          child: img,
+        );
+      }
 
       // 1. Apply filter matrix (preset filters)
       final List<double>? matrix = element.filterMatrix;
@@ -697,21 +711,85 @@ class EditorView extends GetView<EditorViewModel> {
   }
 
   Widget _buildIconsPanel() {
-    return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      _phdr('Assets', undo: controller.undo, redo: controller.redo),
-      GestureDetector(onTap: () => controller.addImage(), child: Container(
-        width: double.infinity, padding: EdgeInsets.symmetric(vertical: 14.h),
-        decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r), border: Border.all(color: const Color(0xFF008080).withValues(alpha: 0.5))),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_rounded, color: const Color(0xFF008080), size: 20.sp), SizedBox(width: 8.w), Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp))]),
-      )),
-      _sp(14), _lbl('SHAPES'),
-      Wrap(spacing: 8.w, runSpacing: 8.h, children: [
-        _shpBtn('Circle', Icons.circle_outlined, 'circle'), _shpBtn('Rect', Icons.crop_square_rounded, 'rect'),
-        _shpBtn('Triangle', Icons.change_history_rounded, 'triangle'), _shpBtn('Star', Icons.star_border_rounded, 'star'),
-        _shpBtn('Hexagon', Icons.hexagon_outlined, 'hexagon'), _shpBtn('Pentagon', Icons.pentagon_outlined, 'pentagon'),
-        _shpBtn('Heart', Icons.favorite_border_rounded, 'heart'),
-      ]),
-    ]));
+    return _panelPad(Obx(() {
+      final shapeTab = controller.shapeTab.value;
+      final shapeCats = ['General', 'basic', 'd_reverse', 'icons', 'label', 'lines', 'rectangular', 'ribben', 'round'];
+      final firebaseCats = ['basic', 'd_reverse', 'icons', 'label', 'lines', 'rectangular', 'ribben', 'round'];
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+        _phdr('Assets', undo: controller.undo, redo: controller.redo),
+        GestureDetector(onTap: () => controller.addImage(), child: Container(
+          width: double.infinity, padding: EdgeInsets.symmetric(vertical: 14.h),
+          decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r), border: Border.all(color: const Color(0xFF008080).withValues(alpha: 0.5))),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_rounded, color: const Color(0xFF008080), size: 20.sp), SizedBox(width: 8.w), Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp))]),
+        )),
+        _sp(14), _lbl('SHAPES'),
+        // Category tabs (background-style)
+        Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(children: shapeCats.map((cat) {
+              final isSel = shapeTab == cat;
+              return GestureDetector(
+                onTap: () {
+                  controller.shapeTab.value = cat;
+                  if (firebaseCats.contains(cat)) {
+                    controller.loadShapeImages(cat);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+                  decoration: BoxDecoration(
+                    color: isSel ? const Color(0xFF008080) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(cat, style: GoogleFonts.outfit(
+                    color: isSel ? Colors.black : Colors.black38,
+                    fontWeight: FontWeight.bold, fontSize: 9.sp,
+                  ))),
+                ),
+              );
+            }).toList()),
+          ),
+        ),
+        _sp(12),
+        if (shapeTab == 'General')
+          Wrap(spacing: 8.w, runSpacing: 8.h, children: [
+            _shpBtn('Circle', Icons.circle_outlined, 'circle'), _shpBtn('Rect', Icons.crop_square_rounded, 'rect'),
+            _shpBtn('Triangle', Icons.change_history_rounded, 'triangle'), _shpBtn('Star', Icons.star_border_rounded, 'star'),
+            _shpBtn('Hexagon', Icons.hexagon_outlined, 'hexagon'), _shpBtn('Pentagon', Icons.pentagon_outlined, 'pentagon'),
+            _shpBtn('Heart', Icons.favorite_border_rounded, 'heart'),
+          ])
+        else
+          Obx(() {
+            if (controller.isLoadingShapes.value) {
+              return Container(height: 120.h, alignment: Alignment.center, child: SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080))));
+            }
+            if (controller.currentShapeImages.isEmpty) {
+              return Center(child: Padding(padding: EdgeInsets.symmetric(vertical: 24.h),
+                child: Column(children: [Icon(Icons.image_outlined, color: Colors.black87.withOpacity(0.24), size: 40.sp), SizedBox(height: 10.h), Text('No shapes found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp))])));
+            }
+            return Wrap(spacing: 10.w, runSpacing: 10.h, children: controller.currentShapeImages.map((url) {
+              return GestureDetector(
+                onTap: () => controller.addShapeImageFromUrl(url),
+                child: Container(
+                  width: 72.w, height: 72.w,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8E8EE),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: Colors.black87.withOpacity(0.12)),
+                    image: DecorationImage(image: NetworkImage(url), fit: BoxFit.contain),
+                  ),
+                ),
+              );
+            }).toList());
+          }),
+      ]));
+    }));
   }
 
   Widget _buildColorsPanel() {
@@ -726,8 +804,6 @@ class EditorView extends GetView<EditorViewModel> {
         _phdr('Colors', undo: controller.undo, redo: controller.redo),
         if (!hasSel)
           _empty('Select an element to change its color', Icons.color_lens_outlined)
-        else if (isImage)
-          _empty('Colors cannot be applied to images.\nUse "EFFECTS" tab for image filters.', Icons.image_not_supported_rounded)
         else ...[
           // ── SOLID / GRADIENT tab switcher ──
           Container(
@@ -755,7 +831,7 @@ class EditorView extends GetView<EditorViewModel> {
 
           // ── SOLID tab ──
           if (activeTab == 'SOLID') ...[
-            _lbl('TEXT FILL COLOR'),
+            _lbl(isImage ? 'IMAGE TINT COLOR' : 'TEXT FILL COLOR'),
             // clrRow: picks a solid color, clears any gradient
             _clrRow(e!.color, (c) => controller.updateSelectedElement((x) => x.copyWith(color: c, shapeGradient: null))),
             _sp(16),
@@ -852,7 +928,7 @@ class EditorView extends GetView<EditorViewModel> {
       final hasNonText = idx != -1 && !hasText;
       final e = hasText ? controller.components[idx] : null;
 
-      final cats = ['All Styles', 'Gaming', 'Editorial', 'Monospace'];
+      final cats = ['All Styles', 'Gaming', 'Editorial', 'Decorative', 'General', 'Urdu', 'Monospace'];
 
       return _panelPad(SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -881,51 +957,60 @@ class EditorView extends GetView<EditorViewModel> {
             else if (!hasText)
               _empty('Select a text element to pick a font', Icons.font_download_rounded)
             else ...[
-              // ── Category selection ──
-              SizedBox(
-                height: 38.h,
-                child: ListView.builder(
+              // ── Category selection (background-style) ──
+              Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
+                child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
-                  itemCount: cats.length,
-                  itemBuilder: (context, i) {
-                    final cat = cats[i];
+                  child: Row(children: cats.map((cat) {
                     final isSel = controller.selectedFontCategory.value == cat;
                     return GestureDetector(
-                      onTap: () => controller.selectedFontCategory.value = cat,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: EdgeInsets.only(right: 8.w),
-                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                      onTap: () {
+                        controller.selectedFontCategory.value = cat;
+                        final firebaseCats = ['Decorative', 'General', 'Urdu'];
+                        if (firebaseCats.contains(cat)) {
+                          controller.loadFontNames(cat);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
                         decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFF008080) : Colors.black87.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(20.r),
+                          color: isSel ? const Color(0xFF008080) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
-                        child: Text(cat, style: GoogleFonts.outfit(
-                          color: isSel ? Colors.black : Colors.black87.withOpacity(0.7),
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        )),
+                        child: FittedBox(fit: BoxFit.scaleDown, child: Text(cat, style: GoogleFonts.outfit(
+                          color: isSel ? Colors.black : Colors.black38,
+                          fontWeight: FontWeight.bold, fontSize: 9.sp,
+                        ))),
                       ),
                     );
-                  },
+                  }).toList()),
                 ),
               ),
               _sp(8), // Reduced spacing
 
               // ── Font Grid ──
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8.w,
-                  mainAxisSpacing: 8.h,
-                  childAspectRatio: 2.3,
-                ),
-                itemCount: controller.filteredFonts.length,
-                itemBuilder: (context, i) => _fcard(controller.filteredFonts[i], e!),
+              Obx(() => controller.isLoadingFonts.value
+                  ? Container(
+                      height: 120.h,
+                      alignment: Alignment.center,
+                      child: SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080))),
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8.w,
+                        mainAxisSpacing: 8.h,
+                        childAspectRatio: 2.3,
+                      ),
+                      itemCount: controller.filteredFonts.length,
+                      itemBuilder: (context, i) => _fcard(controller.filteredFonts[i], e!),
+                    ),
               ),
             ],
             _sp(15), // Very small spacer to keep it compact
@@ -944,14 +1029,19 @@ class EditorView extends GetView<EditorViewModel> {
       _phdr('Background'),
       Text('Select the atmosphere for your atelier', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp)),
       _sp(14),
-      // Tabs: TRANSPARENT | SOLID | GRADIENT | TEXTURE
+      // Tabs: ABSTRACT | SOLID | BLURY | VINTAGE
       Container(
         padding: EdgeInsets.all(4.w),
         decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
-        child: Row(children: ['TRANSPARENT', 'SOLID', 'GRADIENT', 'TEXTURE'].map((tab) {
+        child: Row(children: ['ABSTRACT', 'SOLID', 'BLURY', 'VINTAGE'].map((tab) {
           final sel = bgTab == tab;
           return Expanded(child: GestureDetector(
-            onTap: () => controller.bgTab.value = tab,
+            onTap: () {
+              controller.bgTab.value = tab;
+              if (tab == 'ABSTRACT') controller.loadAbstractImages();
+              else if (tab == 'BLURY') controller.loadBluryImages();
+              else if (tab == 'VINTAGE') controller.loadVintageImages();
+            },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 9.h),
               decoration: BoxDecoration(
@@ -968,22 +1058,35 @@ class EditorView extends GetView<EditorViewModel> {
       ),
       _sp(16),
 
-      if (bgTab == 'TRANSPARENT') ...[
-        // Transparent option - just a preview
-        Center(child: GestureDetector(
-          onTap: () => controller.setBackgroundColor(Colors.transparent),
-          child: Container(
-            width: 80.w, height: 80.w,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: const Color(0xFF008080), width: 2),
-              image: const DecorationImage(image: AssetImage('assets/images/logo1.jpg'), opacity: 0.1, fit: BoxFit.cover),
-            ),
-            child: Icon(Icons.block_rounded, color: const Color(0xFF008080), size: 32.sp),
-          ),
-        )),
-        _sp(12),
-        Center(child: Text('No background (transparent)', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp))),
+      if (bgTab == 'ABSTRACT') ...[
+        _lbl('ABSTRACT BACKGROUNDS'),
+        if (controller.abstractImages.isEmpty)
+          Center(child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24.h),
+            child: Obx(() => controller.isLoadingBg.value
+                ? SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080)))
+                : Column(children: [
+                    Icon(Icons.image_outlined, color: Colors.black87.withOpacity(0.24), size: 40.sp),
+                    SizedBox(height: 10.h),
+                    Text('No abstract backgrounds found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
+                  ])),
+          ))
+        else
+          Wrap(spacing: 10.w, runSpacing: 10.h, children: controller.abstractImages.map((url) {
+            final isSel = controller.backgroundImageUrl.value == url;
+            return GestureDetector(
+              onTap: () => controller.setBackgroundImage(url),
+              child: Container(
+                width: 72.w, height: 72.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: isSel ? const Color(0xFF008080) : Colors.transparent, width: 2.5),
+                  image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+                ),
+                child: isSel ? Center(child: Icon(Icons.check_rounded, color: const Color(0xFF008080), size: 20.sp)) : null,
+              ),
+            );
+          }).toList()),
       ]
       else if (bgTab == 'SOLID') ...[
         _lbl('COLORS'),
@@ -1020,42 +1123,81 @@ class EditorView extends GetView<EditorViewModel> {
             )).toList()),
           ]),
         )),
-      ]
-      else if (bgTab == 'GRADIENT') ...[
-        _lbl('GRADIENTS'),
-        Wrap(
-          spacing: 10.w,
-          runSpacing: 10.h,
-          children: _gradients().map((g) {
-            final isSel = controller.backgroundGradient.value != null &&
-                controller.backgroundGradient.value!.first.value == g.first.value;
-            return GestureDetector(
-              onTap: () => controller.setBackgroundGradient(g),
-              child: Container(
-                width: 60.w, height: 60.w,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: g, begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: isSel ? Colors.black87 : Colors.transparent, width: 2.5),
-                ),
-                child: isSel ? Icon(Icons.check_rounded, color: Colors.black87, size: 20.sp) : null,
-              ),
-            );
-          }).toList(),
+        _sp(16),
+        _lbl('GRADIENT COLORS'),
+        _clrRow(
+          controller.backgroundColor.value,
+          (c) => controller.setBackgroundColor(c),
+          extra: [
+            const Color(0xFF008080), Colors.teal, Colors.orange, Colors.red,
+            Colors.green, const Color(0xFF00c6ff), const Color(0xFF0072ff),
+            const Color(0xFF3a7bd5), const Color(0xFFBF953F), const Color(0xFFB38728),
+            const Color(0xFF707070), const Color(0xFF000428), const Color(0xFF004e92),
+            const Color(0xFF232526), const Color(0xFFB71C1C), const Color(0xFF0D47A1),
+            const Color(0xFFFF0000), const Color(0xFFFF7700), const Color(0xFFFFFF00),
+            const Color(0xFF00FF00), const Color(0xFF0000FF), const Color(0xFF8B00FF),
+          ],
         ),
       ]
-      else if (bgTab == 'TEXTURE') ...[
-        // NOTE: Texture images not available yet - add asset images to assets/textures/ folder
-        Center(child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24.h),
-          child: Column(children: [
-            Icon(Icons.texture_rounded, color: Colors.black87.withOpacity(0.24), size: 40.sp),
-            SizedBox(height: 10.h),
-            Text('Textures coming soon', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
-            SizedBox(height: 4.h),
-            Text('Add images to assets/textures/', style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.24), fontSize: 10.sp)),
-          ]),
-        )),
+      else if (bgTab == 'BLURY') ...[
+        _lbl('BLURY BACKGROUNDS'),
+        if (controller.bluryImages.isEmpty)
+          Center(child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24.h),
+            child: Obx(() => controller.isLoadingBg.value
+                ? SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080)))
+                : Column(children: [
+                    Icon(Icons.blur_on_rounded, color: Colors.black87.withOpacity(0.24), size: 40.sp),
+                    SizedBox(height: 10.h),
+                    Text('No blurry backgrounds found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
+                  ])),
+          ))
+        else
+          Wrap(spacing: 10.w, runSpacing: 10.h, children: controller.bluryImages.map((url) {
+            final isSel = controller.backgroundImageUrl.value == url;
+            return GestureDetector(
+              onTap: () => controller.setBackgroundImage(url),
+              child: Container(
+                width: 72.w, height: 72.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: isSel ? const Color(0xFF008080) : Colors.transparent, width: 2.5),
+                  image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+                ),
+                child: isSel ? Center(child: Icon(Icons.check_rounded, color: const Color(0xFF008080), size: 20.sp)) : null,
+              ),
+            );
+          }).toList()),
+      ]
+      else if (bgTab == 'VINTAGE') ...[
+        _lbl('VINTAGE BACKGROUNDS'),
+        if (controller.vintageImages.isEmpty)
+          Center(child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24.h),
+            child: Obx(() => controller.isLoadingBg.value
+                ? SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080)))
+                : Column(children: [
+                    Icon(Icons.auto_awesome, color: Colors.black87.withOpacity(0.24), size: 40.sp),
+                    SizedBox(height: 10.h),
+                    Text('No vintage backgrounds found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
+                  ])),
+          ))
+        else
+          Wrap(spacing: 10.w, runSpacing: 10.h, children: controller.vintageImages.map((url) {
+            final isSel = controller.backgroundImageUrl.value == url;
+            return GestureDetector(
+              onTap: () => controller.setBackgroundImage(url),
+              child: Container(
+                width: 72.w, height: 72.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: isSel ? const Color(0xFF008080) : Colors.transparent, width: 2.5),
+                  image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+                ),
+                child: isSel ? Center(child: Icon(Icons.check_rounded, color: const Color(0xFF008080), size: 20.sp)) : null,
+              ),
+            );
+          }).toList()),
       ],
 
       _sp(12),
@@ -1122,7 +1264,9 @@ class EditorView extends GetView<EditorViewModel> {
                               colorFilter: ColorFilter.matrix(fMatrix),
                               child: e.content.startsWith('assets/')
                                   ? Image.asset(e.content, fit: BoxFit.cover)
-                                  : Image.file(File(e.content), fit: BoxFit.cover),
+                                  : e.content.startsWith('http')
+                                      ? Image.network(e.content, fit: BoxFit.cover)
+                                      : Image.file(File(e.content), fit: BoxFit.cover),
                             ),
                           ),
                         ),
@@ -1135,6 +1279,8 @@ class EditorView extends GetView<EditorViewModel> {
               },
             ),
           ),
+          _sp(10), _lbl('IMAGE TINT COLOR'),
+          _clrRow(e.color, (c) => controller.updateSelectedElement((x) => x.copyWith(color: c == Colors.transparent ? null : c))),
           _sp(10), _lbl('ADJUSTMENTS'),
           _lbl('Brightness  •  ${e.brightness.toStringAsFixed(1)}'), _sld(e.brightness, -1, 1, (v) => controller.updateSelectedElement((x) => x.copyWith(brightness: v), saveHistory: false)),
           _lbl('Contrast  •  ${e.contrast.toStringAsFixed(1)}'), _sld(e.contrast, 0, 2, (v) => controller.updateSelectedElement((x) => x.copyWith(contrast: v), saveHistory: false)),

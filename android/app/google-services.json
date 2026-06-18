@@ -1,48 +1,48 @@
 {
   "project_info": {
-    "project_number": "955777504028",
-    "project_id": "logomaker-6d294",
-    "storage_bucket": "logomaker-6d294.firebasestorage.app"
+    "project_number": "517082423908",
+    "project_id": "logo-creation-13cea",
+    "storage_bucket": "logo-creation-13cea.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:955777504028:android:597b1a71a81f01c57060d9",
+        "mobilesdk_app_id": "1:517082423908:android:8048bb859bad0231e4b571",
         "android_client_info": {
-          "package_name": "com.example.untitled1"
+          "package_name": "com.musaf.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "955777504028-o46ro8ta8ipj4ml518vmil38ogsbeupc.apps.googleusercontent.com",
+          "client_id": "517082423908-cuqr7jqav92gib4p3fbqr9lmi91ac4sj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.untitled1",
+            "package_name": "com.musaf.app",
             "certificate_hash": "c7bfeeff652136a46f0d30b1360d83c6d42de8ce"
           }
         },
         {
-          "client_id": "955777504028-d1905pd19r0qcsu7e0i5sjfvhg7913sm.apps.googleusercontent.com",
+          "client_id": "517082423908-eqdq47b3tama2oh3pqtq3tfg59ujt4q8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBMQAL69hlbGgWK6MCDBKNQzECczZenENk"
+          "current_key": "AIzaSyA5QBrgiQXyx8rRjf-TDSbuHCdBj8Yaxv0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "955777504028-d1905pd19r0qcsu7e0i5sjfvhg7913sm.apps.googleusercontent.com",
+              "client_id": "517082423908-eqdq47b3tama2oh3pqtq3tfg59ujt4q8.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "955777504028-e3odpc113reruesjoog8g37lao4e294r.apps.googleusercontent.com",
+              "client_id": "517082423908-gabl2j7utq8ov91ogeopam5u49sqh456.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.untitled1"
+                "bundle_id": "com.musaf.app"
               }
             }
           ]

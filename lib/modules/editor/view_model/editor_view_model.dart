@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import '../../../app/services/storage_service.dart';
 import '../../../models/editor_element.dart';
 import '../../history/view_model/history_view_model.dart';
 
@@ -22,6 +23,7 @@ class EditorViewModel extends GetxController {
   // Panel tab states
   final colorTab = 'SOLID'.obs;
   final bgTab = 'SOLID'.obs;
+  final shapeTab = 'General'.obs;
   
   final isLoading = false.obs;
   final isEditingText = false.obs;
@@ -120,7 +122,19 @@ class EditorViewModel extends GetxController {
   // Background State
   final backgroundColor = Colors.white.obs; // Light Theme
   final backgroundGradient = Rx<List<Color>?>(null);
+  final backgroundImageUrl = Rx<String?>(null);
+  final abstractImages = <String>[].obs;
+  final bluryImages = <String>[].obs;
+  final vintageImages = <String>[].obs;
+  final isLoadingBg = false.obs;
   
+  final currentFirebaseFonts = <String>[].obs;
+  final isLoadingFonts = false.obs;
+
+  final currentShapeImages = <String>[].obs;
+  final isLoadingShapes = false.obs;
+  final shapeImagesCache = <String, List<String>>{};
+
   final List<String> fonts = [
     // GAMING
     'Press Start 2P', 'Orbitron', 'Russo One', 'Black Ops One', 'Michroma', 'Silkscreen', 'Chakra Petch', 'Wallpoet', 'Megrim', 'Saira Stencil One',
@@ -139,6 +153,10 @@ class EditorViewModel extends GetxController {
     if (selectedFontCategory.value == 'Gaming') return ['Press Start 2P', 'Orbitron', 'Russo One', 'Black Ops One', 'Michroma', 'Silkscreen', 'Chakra Petch', 'Wallpoet', 'Megrim', 'Saira Stencil One', 'Audiowide', 'Staatliches'];
     if (selectedFontCategory.value == 'Editorial') return ['Bodoni Moda', 'Playfair Display', 'Prata', 'Cinzel', 'Cormorant Garamond', 'Libre Baskerville', 'Abril Fatface', 'Crimson Text', 'Fraunces', 'Cardo', 'Noto Serif', 'Libre Caslon Display', 'Spectral'];
     if (selectedFontCategory.value == 'Monospace') return ['Space Mono', 'Fira Code', 'Source Code Pro', 'JetBrains Mono', 'Nova Mono', 'Ubuntu Mono', 'Inconsolata', 'Major Mono Display', 'Roboto Mono', 'Anonymous Pro', 'Courier Prime'];
+    // Firebase font categories
+    if (['Decorative', 'General', 'Urdu'].contains(selectedFontCategory.value)) {
+      return currentFirebaseFonts;
+    }
     return fonts;
   }
 
@@ -479,11 +497,118 @@ class EditorViewModel extends GetxController {
     _pushHistory();
     backgroundColor.value = color;
     backgroundGradient.value = null;
+    backgroundImageUrl.value = null;
   }
 
   void setBackgroundGradient(List<Color> colors) {
     _pushHistory();
     backgroundGradient.value = colors;
+    backgroundImageUrl.value = null;
+  }
+
+  void setBackgroundImage(String url) {
+    _pushHistory();
+    backgroundImageUrl.value = url;
+    backgroundGradient.value = null;
+  }
+
+  Future<void> loadAbstractImages() async {
+    if (abstractImages.isNotEmpty) return;
+    isLoadingBg.value = true;
+    try {
+      final urls = await StorageService.getImagesFromFolder('musaf/background/abstract');
+      abstractImages.assignAll(urls);
+    } catch (_) {
+    } finally {
+      isLoadingBg.value = false;
+    }
+  }
+
+  Future<void> loadBluryImages() async {
+    if (bluryImages.isNotEmpty) return;
+    isLoadingBg.value = true;
+    try {
+      final urls = await StorageService.getImagesFromFolder('musaf/background/blury');
+      bluryImages.assignAll(urls);
+    } catch (_) {
+    } finally {
+      isLoadingBg.value = false;
+    }
+  }
+
+  Future<void> loadVintageImages() async {
+    if (vintageImages.isNotEmpty) return;
+    isLoadingBg.value = true;
+    try {
+      final urls = await StorageService.getImagesFromFolder('musaf/background/vintage');
+      vintageImages.assignAll(urls);
+    } catch (_) {
+    } finally {
+      isLoadingBg.value = false;
+    }
+  }
+
+  Future<void> loadFontNames(String category) async {
+    final key = category.toLowerCase();
+    isLoadingFonts.value = true;
+    try {
+      final names = await StorageService.getFileNames('musaf/fonts/$key');
+      currentFirebaseFonts.value = names.map((n) => n.replaceAll(RegExp(r'\.(ttf|otf)$'), '')).toList();
+    } catch (_) {
+      currentFirebaseFonts.value = [];
+    } finally {
+      isLoadingFonts.value = false;
+    }
+  }
+
+  Future<void> loadShapeImages(String category) async {
+    final key = category.toLowerCase();
+    if (shapeImagesCache.containsKey(key)) {
+      currentShapeImages.value = shapeImagesCache[key]!;
+      return;
+    }
+    isLoadingShapes.value = true;
+    try {
+      final urls = await StorageService.getImagesFromFolder('musaf/shapes/$key');
+      shapeImagesCache[key] = urls;
+      currentShapeImages.value = urls;
+    } catch (_) {
+      currentShapeImages.value = [];
+    } finally {
+      isLoadingShapes.value = false;
+    }
+  }
+
+  Future<void> addShapeImageFromUrl(String url) async {
+    try {
+      final client = HttpClient();
+      final request = await client.getUrl(Uri.parse(url));
+      final response = await request.close();
+      final lists = await response.toList();
+      final totalLen = lists.fold<int>(0, (p, c) => p + c.length);
+      final bytes = Uint8List(totalLen);
+      int offset = 0;
+      for (final list in lists) {
+        bytes.setRange(offset, offset + list.length, list);
+        offset += list.length;
+      }
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/shape_${DateTime.now().millisecondsSinceEpoch}.png');
+      await file.writeAsBytes(bytes);
+      client.close();
+
+      final newElement = EditorElement(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: ElementType.image,
+        position: const Offset(100, 100),
+        content: file.path,
+        scale: 0.6,
+        color: const Color(0xFF008080),
+      );
+      _pushHistory();
+      components.add(newElement);
+      selectElement(components.length - 1);
+    } catch (_) {}
   }
 
   Future<void> exportDesign() async {

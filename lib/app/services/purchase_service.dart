@@ -47,39 +47,58 @@ class PurchaseService extends GetxService {
   void _loadFallbackProducts() {
     isLoadingProducts.value = true;
     productDetails.clear();
-    for (final plan in SubscriptionData.plans) {
+
+    // Hardcoded fallback prices when Google Play is unavailable
+    const fallbackPrices = {
+      'com.xenderservices.logo.maker.weekly': '\$4.99',
+      'com.xenderservices.logo.maker.monthly': '\$9.99',
+      'com.xenderservices.logo.maker.yearly': '\$79.99',
+    };
+
+    for (final plan in SubscriptionData.to.plans) {
+      final price = fallbackPrices[plan.id] ?? plan.price;
+      debugPrint('📦 FALLBACK product: ${plan.id} -> $price');
       productDetails[plan.id] = ProductDetails(
         id: plan.id,
-        title: '${plan.title} (${plan.price})',
+        title: '${plan.title} ($price)',
         description: plan.features.join(', '),
-        price: plan.price,
-        rawPrice: double.tryParse(plan.price.replaceAll(RegExp(r'[$,]'), '')) ?? 0,
+        price: price,
+        rawPrice: double.tryParse(price.replaceAll(RegExp(r'[$,]'), '')) ?? 0,
         currencyCode: 'USD',
       );
     }
+
+    // Sync fallback prices back into plan data
+    SubscriptionData.to.mergeWithRealProducts();
     isLoadingProducts.value = false;
   }
 
   Future<void> _loadProducts() async {
     isLoadingProducts.value = true;
     try {
-      final ids = SubscriptionData.plans.map((p) => p.productId).toSet();
+      final ids = SubscriptionData.to.plans.map((p) => p.productId).toSet();
       final response = await _inAppPurchase.queryProductDetails(ids);
 
       if (response.notFoundIDs.isNotEmpty) {
-        debugPrint('Products not found in Play Console: ${response.notFoundIDs}');
+        debugPrint('❌ Products NOT found in Play Console: ${response.notFoundIDs}');
+      }
+
+      if (response.productDetails.isEmpty) {
+        debugPrint('⚠️ No product details returned from Google Play');
+        _loadFallbackProducts();
+        return;
       }
 
       productDetails.clear();
       for (final detail in response.productDetails) {
+        debugPrint('✅ REAL product loaded: ${detail.id} -> ${detail.price}');
         productDetails[detail.id] = detail;
       }
 
-      if (productDetails.isEmpty) {
-        _loadFallbackProducts();
-      }
+      // Merge real prices back into plan data
+      SubscriptionData.to.mergeWithRealProducts();
     } catch (e) {
-      debugPrint('Error loading products: $e');
+      debugPrint('❌ Error loading products: $e');
       _loadFallbackProducts();
     }
     isLoadingProducts.value = false;
@@ -109,20 +128,7 @@ class PurchaseService extends GetxService {
 
   void _simulatePurchase(SubscriptionPlan plan) {
     final now = DateTime.now();
-    Duration period;
-    switch (plan.id) {
-      case 'weekly_subscription_id':
-        period = const Duration(days: 7);
-        break;
-      case 'monthly_subscription_id':
-        period = const Duration(days: 30);
-        break;
-      case 'yearly_subscription_id':
-        period = const Duration(days: 365);
-        break;
-      default:
-        period = const Duration(days: 30);
-    }
+    final period = SubscriptionData.to.periodForPlan(plan.id);
     _activateSubscription(plan.id, now.add(period));
     isPurchasing.value = false;
   }
@@ -146,9 +152,9 @@ class PurchaseService extends GetxService {
         await _inAppPurchase.completePurchase(purchase);
       }
 
-      final plan = SubscriptionData.getByProductId(purchase.productID);
+      final plan = SubscriptionData.to.getByProductId(purchase.productID);
       if (plan != null) {
-        final expiry = DateTime.now().add(_periodForPlan(plan.id));
+        final expiry = DateTime.now().add(SubscriptionData.to.periodForPlan(plan.id));
         await _activateSubscription(plan.id, expiry);
       }
     } catch (e) {
@@ -158,7 +164,7 @@ class PurchaseService extends GetxService {
   }
 
   Future<void> _activateSubscription(String planId, DateTime expiry) async {
-    final plan = SubscriptionData.getById(planId);
+    final plan = SubscriptionData.to.getById(planId);
     subscribedPlanId.value = planId;
     activePlanTitle.value = plan.title;
     expiryDate.value = '${expiry.month}/${expiry.day}/${expiry.year}';
@@ -177,7 +183,7 @@ class PurchaseService extends GetxService {
     if (planId != null && expiryStr != null) {
       final expiry = DateTime.tryParse(expiryStr);
       if (expiry != null && expiry.isAfter(DateTime.now())) {
-        final plan = SubscriptionData.getById(planId);
+        final plan = SubscriptionData.to.getById(planId);
         subscribedPlanId.value = planId;
         activePlanTitle.value = plan.title;
         expiryDate.value = '${expiry.month}/${expiry.day}/${expiry.year}';
@@ -186,19 +192,6 @@ class PurchaseService extends GetxService {
         await prefs.remove('subscription_plan_id');
         await prefs.remove('subscription_expiry');
       }
-    }
-  }
-
-  Duration _periodForPlan(String planId) {
-    switch (planId) {
-      case 'weekly_subscription_id':
-        return const Duration(days: 7);
-      case 'monthly_subscription_id':
-        return const Duration(days: 30);
-      case 'yearly_subscription_id':
-        return const Duration(days: 365);
-      default:
-        return const Duration(days: 30);
     }
   }
 

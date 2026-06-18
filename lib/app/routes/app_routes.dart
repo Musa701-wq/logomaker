@@ -10,4 +10,6 @@ class AppRoutes {
   static const String historyDetail = '/history-detail';
   static const String templates = '/templates';
   static const String welcomeBanner = '/welcome-banner';
+  static const String howToUse = '/how-to-use';
+  static const String rateUs = '/rate-us';
 }

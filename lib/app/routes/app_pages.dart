@@ -24,6 +24,8 @@ import '../../modules/templates/view/templates_view.dart';
 import '../../modules/templates/view_model/templates_view_model.dart';
 import '../../modules/welcome_banner/view/welcome_banner_view.dart';
 import '../../modules/welcome_banner/view_model/welcome_banner_view_model.dart';
+import '../../modules/how_to_use/view/how_to_use_view.dart';
+import '../../modules/rate_us/view/rate_us_view.dart';
 
 class AppPages {
   static const initial = AppRoutes.splash;
@@ -111,6 +113,14 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut(() => WelcomeBannerViewModel());
       }),
+    ),
+    GetPage(
+      name: AppRoutes.howToUse,
+      page: () => const HowToUseView(),
+    ),
+    GetPage(
+      name: AppRoutes.rateUs,
+      page: () => const RateUsView(),
     ),
   ];
 }

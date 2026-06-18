@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../app/utils/color_constants.dart';
+import '../../../app/widgets/cached_image.dart';
 
 class CategoryGridView extends StatelessWidget {
   final String title;
@@ -47,10 +47,9 @@ class CategoryGridView extends StatelessWidget {
           crossAxisSpacing: 16.w,
           childAspectRatio: 1.0,
         ),
-        // Multiply by 4 just to show a full grid of dummy items
-        itemCount: items.isNotEmpty ? items.length * 4 : 0,
+        itemCount: items.length,
         itemBuilder: (context, index) {
-          final project = items[index % items.length];
+          final project = items[index];
           return GestureDetector(
             onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
               'templateImage': project['image'],
@@ -62,7 +61,11 @@ class CategoryGridView extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(project['image'] ?? 'assets/images/logo1.jpg', fit: BoxFit.cover),
+                  CachedImage(
+                    project['image']!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(color: Colors.grey[800]),
+                  ),
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(

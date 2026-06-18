@@ -276,44 +276,33 @@ class CreditsView extends GetView<CreditsViewModel> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      plan.title,
-                      style: GoogleFonts.outfit(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        plan.title,
+                        style: GoogleFonts.outfit(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                    if (plan.isPopular) ...[
-                      SizedBox(width: 8.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                        decoration: BoxDecoration(
-                          color: accentColor,
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        child: Text(
-                          'POPULAR',
-                          style: GoogleFonts.outfit(
-                            fontSize: 9.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+
                   ],
                 ),
                 SizedBox(height: 10.h),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      plan.price,
-                      style: GoogleFonts.outfit(
-                        fontSize: 30.sp,
-                        fontWeight: FontWeight.bold,
-                        color: accentColor,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        plan.price,
+                        style: GoogleFonts.outfit(
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.bold,
+                          color: accentColor,
+                        ),
                       ),
                     ),
                     SizedBox(width: 6.w),
@@ -347,11 +336,14 @@ class CreditsView extends GetView<CreditsViewModel> {
                           Icon(Icons.check_circle_rounded,
                               color: accentColor, size: 15.sp),
                           SizedBox(width: 8.w),
-                          Text(
-                            feature,
-                            style: GoogleFonts.outfit(
-                              fontSize: 13.sp,
-                              color: Colors.black54,
+                          Flexible(
+                            child: Text(
+                              feature,
+                              style: GoogleFonts.outfit(
+                                fontSize: 13.sp,
+                                color: Colors.black54,
+                              ),
+                              softWrap: true,
                             ),
                           ),
                         ],

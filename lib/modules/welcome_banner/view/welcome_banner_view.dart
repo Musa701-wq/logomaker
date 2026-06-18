@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../app/utils/color_constants.dart';
 import '../view_model/welcome_banner_view_model.dart';
 
 class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
@@ -14,14 +15,14 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF004D4D),
-              Color(0xFF008080),
-              Color(0xFF006666),
+              AppColors.primary.withValues(alpha: 0.9),
+              AppColors.primary,
+              AppColors.primary.withValues(alpha: 0.95),
             ],
           ),
         ),
@@ -31,7 +32,7 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
               Positioned(
                 top: -60.h,
                 right: -40.w,
-                child: _buildBlurCircle(220.w, Colors.amber.withValues(alpha: 0.1)),
+                child: _buildBlurCircle(220.w, AppColors.primary.withValues(alpha: 0.3)),
               ),
               Positioned(
                 bottom: -80.h,
@@ -81,10 +82,10 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                 child: Container(
                                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                                   decoration: BoxDecoration(
-                                    color: Colors.amber.withValues(alpha: 0.2),
+                                    color: AppColors.accentTeal.withValues(alpha: 0.9),
                                     borderRadius: BorderRadius.circular(20.r),
                                     border: Border.all(
-                                      color: Colors.amber.withValues(alpha: 0.4),
+                                      color: Colors.white.withValues(alpha: 0.4),
                                       width: 1,
                                     ),
                                   ),
@@ -93,7 +94,7 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                     style: GoogleFonts.outfit(
                                       fontSize: 10.sp,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.amber.shade200,
+                                      color: AppColors.primary,
                                       letterSpacing: 2,
                                     ),
                                   ),
@@ -128,9 +129,9 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                               colors: [
-                                                const Color(0xFF00A0A0),
-                                                const Color(0xFF006060),
-                                                const Color(0xFF004D4D),
+                                                Colors.white,
+                                                AppColors.accentTeal,
+                                                AppColors.primary.withValues(alpha: 0.3),
                                               ],
                                             ),
                                           ),
@@ -168,7 +169,7 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                                 width: 90.w,
                                                 height: 90.w,
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white.withValues(alpha: 0.12),
+                                                  color: AppColors.primary,
                                                   borderRadius: BorderRadius.circular(24.r),
                                                   border: Border.all(
                                                     color: Colors.white.withValues(alpha: 0.25),
@@ -187,7 +188,7 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                                 style: GoogleFonts.outfit(
                                                   fontSize: 22.sp,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Colors.white,
+                                                  color: AppColors.primary,
                                                   letterSpacing: 6,
                                                 ),
                                               ),
@@ -197,7 +198,7 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                                 style: GoogleFonts.outfit(
                                                   fontSize: 11.sp,
                                                   fontWeight: FontWeight.w500,
-                                                  color: Colors.white.withValues(alpha: 0.7),
+                                                  color: AppColors.primary.withValues(alpha: 0.7),
                                                   letterSpacing: 3,
                                                 ),
                                               ),
@@ -278,59 +279,72 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
                                           padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
                                           decoration: BoxDecoration(
                                             color: isSelected
-                                                ? Colors.white.withValues(alpha: 0.15)
+                                                ? accentColor.withValues(alpha: 0.25)
                                                 : Colors.white.withValues(alpha: 0.05),
                                             borderRadius: BorderRadius.circular(16.r),
                                             border: Border.all(
                                               color: isSelected
-                                                  ? accentColor.withValues(alpha: 0.6)
+                                                  ? accentColor
                                                   : Colors.white.withValues(alpha: 0.1),
-                                              width: isSelected ? 2 : 1,
+                                              width: isSelected ? 2.5 : 1,
                                             ),
                                           ),
                                           child: Column(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
                                               if (plan.isPopular)
-                                                Container(
-                                                  margin: EdgeInsets.only(bottom: 6.h),
-                                                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                                                  decoration: BoxDecoration(
-                                                    color: accentColor,
-                                                    borderRadius: BorderRadius.circular(4.r),
-                                                  ),
-                                                  child: Text(
-                                                    'BEST',
-                                                    style: GoogleFonts.outfit(
-                                                      fontSize: 7.sp,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.white,
+                                                FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Container(
+                                                    margin: EdgeInsets.only(bottom: 6.h),
+                                                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
+                                                    decoration: BoxDecoration(
+                                                      color: accentColor,
+                                                      borderRadius: BorderRadius.circular(4.r),
+                                                    ),
+                                                    child: Text(
+                                                      'BEST',
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 7.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
                                                     ),
                                                   ),
                                                 )
                                               else
                                                 SizedBox(height: 14.h),
-                                              Text(
-                                                plan.title,
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 13.sp,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.white,
+                                              FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  plan.title,
+                                                  style: GoogleFonts.outfit(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                               SizedBox(height: 4.h),
-                                              Text(
-                                                plan.price,
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 20.sp,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: isSelected ? accentColor : Colors.white,
+                                              FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  plan.price,
+                                                  style: GoogleFonts.outfit(
+                                                    fontSize: 20.sp,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                              Text(
-                                                plan.period,
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 9.sp,
-                                                  color: Colors.white.withValues(alpha: 0.5),
+                                              FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  plan.period,
+                                                  style: GoogleFonts.outfit(
+                                                    fontSize: 9.sp,
+                                                    color: Colors.white.withValues(alpha: 0.5),
+                                                  ),
                                                 ),
                                               ),
                                             ],

@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../app/utils/color_constants.dart';
+import '../../../app/widgets/cached_image.dart';
+import '../../../app/widgets/shimmer_loading.dart';
 import '../view_model/templates_view_model.dart';
 
 class TemplatesView extends GetView<TemplatesViewModel> {
@@ -120,6 +122,26 @@ class TemplatesView extends GetView<TemplatesViewModel> {
           // Templates Grid
           Expanded(
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return GridView.builder(
+                  padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h, top: 10.h),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16.h,
+                    crossAxisSpacing: 16.w,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: 6,
+                  itemBuilder: (_, __) => ClipRRect(
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: ShimmerLoading(
+                      width: double.infinity,
+                      height: double.infinity,
+                      borderRadius: 16,
+                    ),
+                  ),
+                );
+              }
               if (controller.filteredTemplates.isEmpty) {
                 return Center(
                   child: Column(
@@ -164,10 +186,10 @@ class TemplatesView extends GetView<TemplatesViewModel> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16.r),
-                              child: Image.asset(
+                              child: CachedImage(
                                 template['image']!,
                                 fit: BoxFit.cover,
-                                width: double.infinity,
+                                errorBuilder: (_, __, ___) => Container(color: Colors.grey[850]),
                               ),
                             ),
                           ),

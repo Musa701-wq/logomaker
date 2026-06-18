@@ -1,0 +1,52 @@
+{
+  "plans": [
+    {
+      "id": "com.xenderservices.logo.maker.weekly",
+      "productId": "com.xenderservices.logo.maker.weekly",
+      "title": "Weekly",
+      "price": "\$4.99",
+      "period": "/week",
+      "features": [
+        "Unlimited logo generations",
+        "AI-powered design tools",
+        "HD quality exports",
+        "No ads"
+      ],
+      "isPopular": false,
+      "color": 4278230232,
+      "durationDays": 7
+    },
+    {
+      "id": "com.xenderservices.logo.maker.monthly",
+      "productId": "com.xenderservices.logo.maker.monthly",
+      "title": "Monthly",
+      "price": "\$9.99",
+      "period": "/month",
+      "features": [
+        "Everything in Weekly",
+        "Background removal",
+        "Priority support",
+        "Custom templates"
+      ],
+      "isPopular": true,
+      "color": 4279595136,
+      "durationDays": 30
+    },
+    {
+      "id": "com.xenderservices.logo.maker.yearly",
+      "productId": "com.xenderservices.logo.maker.yearly",
+      "title": "Yearly",
+      "price": "\$79.99",
+      "period": "/year",
+      "features": [
+        "Everything in Monthly",
+        "4K ultra HD export",
+        "Team collaboration",
+        "Early access features"
+      ],
+      "isPopular": false,
+      "color": 4279376207,
+      "durationDays": 365
+    }
+  ]
+}

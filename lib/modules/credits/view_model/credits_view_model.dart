@@ -14,7 +14,7 @@ class CreditsViewModel extends GetxController {
   RxBool get isLoadingProducts => _purchaseService.isLoadingProducts;
   RxBool get isPurchasing => _purchaseService.isPurchasing;
 
-  List<SubscriptionPlan> get plans => SubscriptionData.plans;
+  List<SubscriptionPlan> get plans => SubscriptionData.to.plans;
 
   ProductDetails? getProductDetails(SubscriptionPlan plan) {
     return _purchaseService.getProductDetails(plan.productId);

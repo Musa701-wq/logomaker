@@ -6,9 +6,12 @@ import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/utils/color_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'modules/profile/view_model/profile_view_model.dart';
 import 'app/services/purchase_service.dart';
+import 'app/services/cache_service.dart';
+import 'app/data/subscription_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +23,23 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print('Firebase Initialized Successfully');
+    // Sign in anonymously so Storage requests have a valid token
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+      print('✅ Anonymous auth OK');
+    } catch (e) {
+      print('❌ Anonymous auth failed: $e');
+      print('⚠️ Enable Anonymous sign-in in Firebase Console > Authentication > Sign-in method');
+    }
     // Global Profile Controller
     Get.put(ProfileViewModel(), permanent: true);
+    // Subscription Data must load BEFORE PurchaseService
+    final subData = Get.put(SubscriptionData(), permanent: true);
+    await subData.load();
     // Purchase Service (in-app purchases & subscriptions)
     Get.put(PurchaseService(), permanent: true);
+    // Initialize image cache (SQLite)
+    await CacheService.instance.init();
   } catch (e) {
     print('FIREBASE INITIALIZATION ERROR: $e');
   }

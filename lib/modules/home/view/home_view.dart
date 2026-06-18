@@ -8,7 +8,8 @@ import '../../history/view/history_view.dart';
 import '../../profile/view/profile_view.dart';
 import '../../credits/view/credits_view.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../app/utils/color_constants.dart';
+import '../../../app/widgets/shimmer_loading.dart';
+import '../../../app/widgets/cached_image.dart';
 import 'category_grid_view.dart';
 
 class HomeView extends GetView<HomeViewModel> {
@@ -17,7 +18,48 @@ class HomeView extends GetView<HomeViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F8), // soft off-white background
+      backgroundColor: const Color(0xFFF4F4F8),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: Colors.black87, size: 24.sp),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        title: Text('LOGO MAKER', style: GoogleFonts.outfit(
+          color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5,
+        )),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.black87, size: 24.sp),
+            onPressed: () => _showSearch(),
+          ),
+          Obx(() => controller.isGuest.value
+            ? Padding(
+                padding: EdgeInsets.only(right: 8.w),
+                child: GestureDetector(
+                  onTap: () => Get.toNamed(AppRoutes.login),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF008080),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text('Login', style: GoogleFonts.outfit(
+                      color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold,
+                    )),
+                  ),
+                ),
+              )
+            : IconButton(
+                icon: Icon(Icons.diamond_outlined, color: const Color(0xFF008080), size: 24.sp),
+                onPressed: () => controller.changeIndex(2),
+              ),
+          ),
+        ],
+      ),
       drawer: _buildDrawer(),
       body: SafeArea(
         child: Obx(() {
@@ -42,80 +84,44 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
-  // ── HOME BODY ──
-  Widget _buildHomeBody() {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(child: _buildTopBar()),
-        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
-        SliverToBoxAdapter(child: _buildTopCategoriesRow()),
-        SliverToBoxAdapter(child: SizedBox(height: 32.h)),
-        SliverToBoxAdapter(child: _buildSection('Most Popular', controller.atelierProjects, isNew: true)),
-        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-        SliverToBoxAdapter(child: _buildSection('Esport', controller.atelierProjects.reversed.toList(), isNew: true)),
-        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-        SliverToBoxAdapter(child: _buildSection('AI', controller.atelierProjects, isNew: true)),
-        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-        SliverToBoxAdapter(child: _buildSection('Fashion', controller.atelierProjects.reversed.toList(), isNew: true)),
-        SliverToBoxAdapter(child: SizedBox(height: 100.h)),
-      ],
+  // ── SEARCH ──
+  void _showSearch() {
+    showSearch(
+      context: Get.context!,
+      delegate: _TemplateSearchDelegate(controller),
     );
   }
 
-  Widget _buildTopBar() {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => GestureDetector(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Icon(Icons.menu, color: Colors.black87, size: 28.sp),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Text('LOGO MAKER', style: GoogleFonts.outfit(
-            color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5,
-          )),
-          const Spacer(),
-          Icon(Icons.search, color: Colors.black87, size: 28.sp),
-          SizedBox(width: 12.w),
-          Obx(() => controller.isGuest.value
-            ? GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.login),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008080),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    'Login',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              )
-            : GestureDetector(
-                onTap: () => controller.changeIndex(2),
-                child: Container(
-                  padding: EdgeInsets.all(6.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008080).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.diamond_outlined, color: const Color(0xFF008080), size: 20.sp),
-                ),
+  // ── HOME BODY ──
+  Widget _buildHomeBody() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return _buildShimmerSections();
+      }
+
+      if (controller.sections.isEmpty) return const SizedBox.shrink();
+      final section = controller.sections.first;
+
+      return CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8.h)),
+          SliverToBoxAdapter(child: _buildTopCategoriesRow()),
+          SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+          for (final folderName in section.folders)
+            if (controller.folderData.containsKey(folderName)) ...[
+              SliverToBoxAdapter(
+                child: _buildFolderSection(folderName, '${section.storagePrefix}/$folderName'),
               ),
-          ),
+              SliverToBoxAdapter(child: SizedBox(height: 20.h)),
+            ],
+          SliverToBoxAdapter(child: SizedBox(height: 100.h)),
         ],
-      ),
-    );
+      );
+    });
   }
+
+  // Removed _buildTopBar - replaced by AppBar
 
   Widget _buildTopCategoriesRow() {
     final cats = [
@@ -131,7 +137,11 @@ class HomeView extends GetView<HomeViewModel> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: cats.map((cat) => GestureDetector(
-          onTap: () => Get.to(() => CategoryGridView(title: cat['name'] as String, items: controller.atelierProjects)),
+          onTap: () {
+            final firstKey = controller.folderData.keys.isNotEmpty ? controller.folderData.keys.first : '';
+            final items = firstKey.isNotEmpty ? (controller.folderData[firstKey] ?? <Map<String, String>>[]) : <Map<String, String>>[];
+            Get.to(() => CategoryGridView(title: cat['name'] as String, items: items));
+          },
           child: Column(
             children: [
               Container(
@@ -165,7 +175,10 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
-  Widget _buildSection(String title, List<Map<String, String>> items, {bool isNew = false}) {
+  Widget _buildFolderSection(String folderName, String storagePath) {
+    final items = controller.folderData[folderName] ?? [];
+    if (items.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -174,29 +187,32 @@ class HomeView extends GetView<HomeViewModel> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(title, style: GoogleFonts.outfit(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-              if (isNew) ...[
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF39C12), // Orange badge color
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
-                  child: Text('NEW', style: GoogleFonts.outfit(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+              Text(folderName, style: GoogleFonts.outfit(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF39C12),
+                  borderRadius: BorderRadius.circular(4.r),
                 ),
-              ],
+                child: Text('NEW', style: GoogleFonts.outfit(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+              ),
               const Spacer(),
               GestureDetector(
-                onTap: () => Get.to(() => CategoryGridView(title: title, items: items)),
-                child: Text('See All', style: GoogleFonts.outfit(color: Colors.grey, fontSize: 13.sp, fontWeight: FontWeight.w500)),
+                onTap: () async {
+                  final allItems = await controller.getAllImagesFromFolder(storagePath);
+                  if (allItems.isNotEmpty) {
+                    Get.to(() => CategoryGridView(title: folderName, items: allItems));
+                  }
+                },
+                child: Text('View All', style: GoogleFonts.outfit(color: Colors.grey, fontSize: 13.sp, fontWeight: FontWeight.w500)),
               ),
             ],
           ),
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 110.w, // small square size
+          height: 110.w,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -225,7 +241,11 @@ class HomeView extends GetView<HomeViewModel> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.asset(project['image']!, fit: BoxFit.cover),
+                        CachedImage(
+                          project['image']!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(color: Colors.grey[800]),
+                        ),
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -239,7 +259,7 @@ class HomeView extends GetView<HomeViewModel> {
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 12.h, left: 8.w, right: 8.w),
                             child: Text(
-                              project['title']!,
+                              folderName,
                               style: GoogleFonts.outfit(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                               maxLines: 2,
@@ -350,42 +370,6 @@ class HomeView extends GetView<HomeViewModel> {
             GestureDetector(
               onTap: () {
                 Get.back();
-                Get.toNamed(AppRoutes.aiGenerator);
-              },
-              child: Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEEEF4),
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: Colors.grey.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(12.w),
-                      decoration: BoxDecoration(color: const Color(0xFF008080).withOpacity(0.1), shape: BoxShape.circle),
-                      child: Icon(Icons.auto_awesome, color: const Color(0xFF008080), size: 24.sp),
-                    ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Create with AI', style: GoogleFonts.outfit(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.black87)),
-                          SizedBox(height: 4.h),
-                          Text('Generate a unique logo using AI', style: GoogleFonts.outfit(fontSize: 12.sp, color: Colors.grey)),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16.sp),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            GestureDetector(
-              onTap: () {
-                Get.back();
                 Get.toNamed(AppRoutes.editor);
               },
               child: Container(
@@ -459,24 +443,31 @@ class HomeView extends GetView<HomeViewModel> {
                     ),
                   ),
                   SizedBox(height: 14.h),
-                  Text(
-                    'LOGO MAKER',
-                    style: GoogleFonts.outfit(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Atelier Design Studio',
-                    style: GoogleFonts.outfit(
-                      fontSize: 12.sp,
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                  Obx(() {
+                    final user = controller.currentUser;
+                    return Column(
+                      children: [
+                        Text(
+                          user?.displayName ?? 'Guest',
+                          style: GoogleFonts.outfit(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          user?.email ?? 'Sign in to personalize',
+                          style: GoogleFonts.outfit(
+                            fontSize: 12.sp,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
                   SizedBox(height: 20.h),
                   // Go Premium Button
                   GestureDetector(
@@ -527,11 +518,11 @@ class HomeView extends GetView<HomeViewModel> {
                   _buildDrawerSection('GENERAL'),
                   _buildDrawerTile(Icons.info_outline_rounded, 'How To Use', onTap: () {
                     Get.back();
-                    Get.snackbar('How To Use', 'Tutorial coming soon!', snackPosition: SnackPosition.BOTTOM);
+                    Get.toNamed(AppRoutes.howToUse);
                   }),
                   _buildDrawerTile(Icons.star_border_rounded, 'Rate Us', onTap: () {
                     Get.back();
-                    Get.snackbar('Rate Us', 'Thank you for your support!', snackPosition: SnackPosition.BOTTOM);
+                    Get.toNamed(AppRoutes.rateUs);
                   }),
                   _buildDrawerTile(Icons.share_rounded, 'Share App', onTap: () {
                     Get.back();
@@ -626,6 +617,178 @@ class HomeView extends GetView<HomeViewModel> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerSections() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.only(top: 20.h),
+      child: Column(
+        children: List.generate(4, (i) => Padding(
+          padding: EdgeInsets.only(bottom: 24.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: ShimmerLoading(width: 140.w, height: 16.h, borderRadius: 4),
+              ),
+              SizedBox(height: 16.h),
+              SizedBox(
+                height: 140.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  itemCount: 5,
+                  itemBuilder: (_, __) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: ShimmerLoading(width: 120.w, height: 140.h, borderRadius: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
+      ),
+    );
+  }
+}
+
+class _TemplateSearchDelegate extends SearchDelegate<String> {
+  final HomeViewModel controller;
+
+  _TemplateSearchDelegate(this.controller);
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context).copyWith(
+      appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: GoogleFonts.outfit(color: Colors.black38, fontSize: 14.sp),
+        border: InputBorder.none,
+      ),
+    );
+  }
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: Icon(Icons.clear_rounded, color: Colors.black54, size: 22.sp),
+          onPressed: () => query = '',
+        ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back_rounded, color: Colors.black87, size: 24.sp),
+      onPressed: () => close(context, ''),
+    );
+  }
+
+  List<String> _filteredFolders() {
+    if (query.isEmpty) return [];
+    final q = query.toLowerCase();
+    return HomeViewModel.allSections
+        .expand((s) => s.folders)
+        .where((f) => f.toLowerCase().contains(q))
+        .toList();
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final results = _filteredFolders();
+    if (results.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_off_rounded, color: Colors.black26, size: 48.sp),
+            SizedBox(height: 12.h),
+            Text('No results found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 14.sp)),
+          ],
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: EdgeInsets.all(16.w),
+      itemCount: results.length,
+      itemBuilder: (_, i) {
+        final folder = results[i];
+        final images = controller.folderData[folder] ?? [];
+        return Container(
+          margin: EdgeInsets.only(bottom: 12.h),
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: Colors.black.withOpacity(0.06)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48.w, height: 48.w,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF008080).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: images.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: Image.network(images.first['image'] ?? '', fit: BoxFit.cover),
+                      )
+                    : Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 24.sp),
+              ),
+              SizedBox(width: 14.w),
+              Text(folder, style: GoogleFonts.outfit(
+                fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.black87,
+              )),
+              const Spacer(),
+              Text('${images.length}', style: GoogleFonts.outfit(
+                fontSize: 12.sp, color: Colors.black38,
+              )),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestions = _filteredFolders();
+    if (query.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_rounded, color: Colors.black26, size: 48.sp),
+            SizedBox(height: 12.h),
+            Text('Search logo categories', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 14.sp)),
+          ],
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: EdgeInsets.all(16.w),
+      itemCount: suggestions.length,
+      itemBuilder: (_, i) {
+        final folder = suggestions[i];
+        return ListTile(
+          leading: Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 22.sp),
+          title: Text(folder, style: GoogleFonts.outfit(
+            color: Colors.black87, fontSize: 14.sp,
+          )),
+          onTap: () {
+            query = folder;
+            showResults(context);
+          },
+        );
+      },
     );
   }
 }
