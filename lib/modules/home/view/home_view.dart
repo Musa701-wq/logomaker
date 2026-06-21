@@ -443,31 +443,28 @@ class HomeView extends GetView<HomeViewModel> {
                     ),
                   ),
                   SizedBox(height: 14.h),
-                  Obx(() {
-                    final user = controller.currentUser;
-                    return Column(
-                      children: [
-                        Text(
-                          user?.displayName ?? 'Guest',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 1,
-                          ),
+                  Column(
+                    children: [
+                      Text(
+                        controller.currentUser?.displayName ?? 'Guest',
+                        style: GoogleFonts.outfit(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 1,
                         ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          user?.email ?? 'Sign in to personalize',
-                          style: GoogleFonts.outfit(
-                            fontSize: 12.sp,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w400,
-                          ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        controller.currentUser?.email ?? 'Sign in to personalize',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ],
-                    );
-                  }),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 20.h),
                   // Go Premium Button
                   GestureDetector(

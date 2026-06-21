@@ -7,6 +7,7 @@ class CacheService {
   static CacheService? _instance;
   Database? _db;
   late final String _cacheDir;
+  final _mutex = {};
 
   CacheService._();
 
@@ -81,9 +82,11 @@ class CacheService {
     int completed = 0;
     for (int i = 0; i < urls.length; i += batchSize) {
       final batch = urls.skip(i).take(batchSize).toList();
-      await Future.wait(batch.map((u) => cacheImage(u)));
-      completed += batch.length;
-      onProgress?.call(completed, urls.length);
+      for (final u in batch) {
+        await cacheImage(u);
+        completed++;
+        onProgress?.call(completed, urls.length);
+      }
     }
   }
 }
