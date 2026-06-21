@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
 import '../../../app/services/storage_service.dart';
 import '../../../app/utils/color_constants.dart';
+import '../../../app/widgets/cached_image.dart';
 import '../../../models/editor_element.dart';
 import '../view_model/editor_view_model.dart';
 
@@ -332,7 +333,7 @@ class EditorView extends GetView<EditorViewModel> {
           onTap: () {
             if (el.type == ElementType.text) {
               controller.selectElement(index);
-              controller.isEditingText.value = true;
+              _showTextEditDialog(index);
             } else {
               controller.selectElement(index);
             }
@@ -363,41 +364,7 @@ class EditorView extends GetView<EditorViewModel> {
   }
 
   Widget _buildElementContent(int index, EditorElement element) {
-    if (element.type == ElementType.text) {
-      final isEditing = controller.isEditingText.value && controller.selectedIndex.value == index;
-      
-      if (isEditing) {
-        // Styled Editor - use element's properties for the input field
-        final double realSize = (element.fontSize ?? 24).sp * element.scale;
-        final Color textColor = element.shapeGradient != null ? element.shapeGradient!.first : (element.color ?? Colors.black87);
-        
-        return IntrinsicWidth(
-          child: TextFormField(
-            initialValue: element.content,
-            autofocus: true,
-            textAlign: TextAlign.center,
-            onChanged: (v) => controller.updateSelectedElement((e) => e.copyWith(content: v)),
-            onFieldSubmitted: (_) => controller.isEditingText.value = false,
-            onTapOutside: (_) => controller.isEditingText.value = false,
-            cursorColor: const Color(0xFF008080),
-            style: _getFont(element.fontFamily ?? 'Manrope').copyWith(
-              fontSize: realSize,
-              color: textColor,
-              fontWeight: element.fontWeight,
-              letterSpacing: element.letterSpacing,
-              height: element.lineHeight,
-              // Add shadow if present to maintain 'styled' look
-              shadows: element.glowRadius > 0 ? [Shadow(color: element.glowColor, blurRadius: element.glowRadius)] : null,
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true,
-            ),
-          ),
-        );
-      }
-      return _buildTextElement(element);
+    if (element.type == ElementType.text) {      return _buildTextElement(element);
     } else if (element.type == ElementType.image) {
       final double imgWidth = 150.w * element.scale;
 
@@ -405,7 +372,8 @@ class EditorView extends GetView<EditorViewModel> {
       Widget img = element.content.startsWith('assets/')
           ? Image.asset(element.content, fit: BoxFit.contain, width: imgWidth)
           : element.content.startsWith('http')
-              ? Image.network(element.content, fit: BoxFit.contain, width: imgWidth)
+              ? CachedImage(element.content, fit: BoxFit.contain, width: imgWidth,
+                  errorBuilder: (_, __, ___) => const SizedBox())
               : Image.file(File(element.content), fit: BoxFit.contain, width: imgWidth);
 
       // Apply shape color tint if set
@@ -636,24 +604,64 @@ class EditorView extends GetView<EditorViewModel> {
   }
 
   Widget _buildBottomNavBar() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.panelDark,
-        border: Border(top: BorderSide(color: Colors.black87.withValues(alpha: 0.05))),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildBottomNavItem('TEXT', Icons.text_fields_rounded, 'TEXT'),
-          _buildBottomNavItem('ICONS', Icons.grid_view_rounded, 'ICONS'),
-          _buildBottomNavItem('COLORS', Icons.color_lens_outlined, 'COLORS'),
-          _buildBottomNavItem('FONTS', Icons.font_download_rounded, 'FONTS'),
-          _buildBottomNavItem('BACKGROUND', Icons.layers_rounded, 'BG'),
-          _buildBottomNavItem('EFFECTS', Icons.auto_awesome_rounded, 'EFFECTS'),
-        ],
-      ),
-    );
+    return Obx(() {
+      final idx = controller.selectedIndex.value;
+      final ElementType? selType = (idx != -1 && idx < controller.components.length)
+          ? controller.components[idx].type
+          : null;
+
+      // Context-aware tabs
+      final List<_NavTab> tabs;
+      if (selType == ElementType.text) {
+        tabs = [
+          _NavTab('TEXT', Icons.text_fields_rounded, 'TEXT'),
+          _NavTab('FONTS', Icons.font_download_rounded, 'FONTS'),
+          _NavTab('COLORS', Icons.color_lens_outlined, 'COLORS'),
+          _NavTab('EFFECTS', Icons.auto_awesome_rounded, 'EFFECTS'),
+          _NavTab('BG', Icons.layers_rounded, 'BG'),
+        ];
+      } else if (selType == ElementType.image) {
+        tabs = [
+          _NavTab('ICONS', Icons.grid_view_rounded, 'ICONS'),
+          _NavTab('COLORS', Icons.color_lens_outlined, 'COLORS'),
+          _NavTab('EFFECTS', Icons.auto_awesome_rounded, 'EFFECTS'),
+          _NavTab('BG', Icons.layers_rounded, 'BG'),
+        ];
+      } else if (selType == ElementType.shape) {
+        tabs = [
+          _NavTab('COLORS', Icons.color_lens_outlined, 'COLORS'),
+          _NavTab('ICONS', Icons.grid_view_rounded, 'ICONS'),
+          _NavTab('EFFECTS', Icons.auto_awesome_rounded, 'EFFECTS'),
+          _NavTab('BG', Icons.layers_rounded, 'BG'),
+        ];
+      } else {
+        // Nothing selected — show all tabs
+        tabs = [
+          _NavTab('TEXT', Icons.text_fields_rounded, 'TEXT'),
+          _NavTab('ICONS', Icons.grid_view_rounded, 'ICONS'),
+          _NavTab('COLORS', Icons.color_lens_outlined, 'COLORS'),
+          _NavTab('FONTS', Icons.font_download_rounded, 'FONTS'),
+          _NavTab('BG', Icons.layers_rounded, 'BG'),
+          _NavTab('EFFECTS', Icons.auto_awesome_rounded, 'EFFECTS'),
+        ];
+      }
+
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: Container(
+          key: ValueKey(selType),
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          decoration: BoxDecoration(
+            color: AppColors.panelDark,
+            border: Border(top: BorderSide(color: Colors.black87.withValues(alpha: 0.05))),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: tabs.map((t) => _buildBottomNavItem(t.label, t.icon, t.id)).toList(),
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildBottomNavItem(String label, IconData icon, String tabId) {
@@ -691,7 +699,33 @@ class EditorView extends GetView<EditorViewModel> {
       if (!hasSelection && !isImageSelected) _empty('Tap + to add text or select text element', Icons.text_fields_rounded)
       else if (isImageSelected) _empty('Font options disabled for images', Icons.image_not_supported_rounded)
       else ...[
-        _lbl('CONTENT'), _tf(e!.content, (v) => controller.updateSelectedElement((x) => x.copyWith(content: v))), _sp(10),
+        _lbl('CONTENT'),
+        GestureDetector(
+          onTap: () => _showTextEditDialog(idx),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F4F8),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: const Color(0xFF008080).withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    e!.content,
+                    style: GoogleFonts.outfit(fontSize: 13.sp, color: Colors.black87),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.edit_rounded, color: const Color(0xFF008080), size: 16.sp),
+              ],
+            ),
+          ),
+        ),
+        _sp(10),
         _lbl('SIZE  •  ${(e.fontSize ?? 24).toInt()}px'), _sld((e.fontSize ?? 24).toDouble(), 8, 200, (v) => controller.updateSelectedElement((x) => x.copyWith(fontSize: v), saveHistory: false)), _sp(4),
         _lbl('WEIGHT'),
         SizedBox(height: 34.h, child: ListView(scrollDirection: Axis.horizontal, children: [
@@ -711,85 +745,133 @@ class EditorView extends GetView<EditorViewModel> {
   }
 
   Widget _buildIconsPanel() {
-    return _panelPad(Obx(() {
+    return Obx(() {
       final shapeTab = controller.shapeTab.value;
       final shapeCats = ['General', 'basic', 'd_reverse', 'icons', 'label', 'lines', 'rectangular', 'ribben', 'round'];
       final firebaseCats = ['basic', 'd_reverse', 'icons', 'label', 'lines', 'rectangular', 'ribben', 'round'];
+
+      // Grid content — dark bg, full width
+      Widget gridSection;
+      if (shapeTab == 'General') {
+        gridSection = Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Wrap(spacing: 8.w, runSpacing: 8.h, children: [
+            _shpBtn('Circle', Icons.circle_outlined, 'circle'),
+            _shpBtn('Rect', Icons.crop_square_rounded, 'rect'),
+            _shpBtn('Triangle', Icons.change_history_rounded, 'triangle'),
+            _shpBtn('Star', Icons.star_border_rounded, 'star'),
+            _shpBtn('Hexagon', Icons.hexagon_outlined, 'hexagon'),
+            _shpBtn('Pentagon', Icons.pentagon_outlined, 'pentagon'),
+            _shpBtn('Heart', Icons.favorite_border_rounded, 'heart'),
+          ]),
+        );
+      } else {
+        gridSection = Obx(() {
+          if (controller.isLoadingShapes.value) {
+            return Container(
+              height: 120.h,
+              alignment: Alignment.center,
+              child: SizedBox(width: 24.sp, height: 24.sp,
+                child: const CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF008080))),
+            );
+          }
+          if (controller.currentShapeImages.isEmpty) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: Column(children: [
+                Icon(Icons.image_outlined, color: Colors.black26, size: 40.sp),
+                SizedBox(height: 10.h),
+                Text('No shapes found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp)),
+              ]),
+            );
+          }
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Wrap(
+              spacing: 10.w, runSpacing: 10.h,
+              children: controller.currentShapeImages.map((url) {
+                return GestureDetector(
+                  onTap: () => controller.addShapeImageFromUrl(url),
+                  child: Container(
+                    width: 72.w, height: 72.w,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E2336),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      image: DecorationImage(image: NetworkImage(url), fit: BoxFit.contain),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        });
+      }
+
       return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        _phdr('Assets', undo: controller.undo, redo: controller.redo),
-        GestureDetector(onTap: () => controller.addImage(), child: Container(
-          width: double.infinity, padding: EdgeInsets.symmetric(vertical: 14.h),
-          decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r), border: Border.all(color: const Color(0xFF008080).withValues(alpha: 0.5))),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_rounded, color: const Color(0xFF008080), size: 20.sp), SizedBox(width: 8.w), Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp))]),
-        )),
-        _sp(14), _lbl('SHAPES'),
-        // Category tabs (background-style)
-        Container(
-          padding: EdgeInsets.all(4.w),
-          decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(children: shapeCats.map((cat) {
-              final isSel = shapeTab == cat;
-              return GestureDetector(
-                onTap: () {
-                  controller.shapeTab.value = cat;
-                  if (firebaseCats.contains(cat)) {
-                    controller.loadShapeImages(cat);
-                  }
-                },
+          // Header + gallery button — padded
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _phdr('Assets', undo: controller.undo, redo: controller.redo),
+              GestureDetector(
+                onTap: () => controller.addImage(),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+                  width: double.infinity, padding: EdgeInsets.symmetric(vertical: 14.h),
                   decoration: BoxDecoration(
-                    color: isSel ? const Color(0xFF008080) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10.r),
+                    color: AppColors.cardDark,
+                    borderRadius: BorderRadius.circular(14.r),
+                    border: Border.all(color: const Color(0xFF008080).withValues(alpha: 0.5)),
                   ),
-                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(cat, style: GoogleFonts.outfit(
-                    color: isSel ? Colors.black : Colors.black38,
-                    fontWeight: FontWeight.bold, fontSize: 9.sp,
-                  ))),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(Icons.image_rounded, color: const Color(0xFF008080), size: 20.sp),
+                    SizedBox(width: 8.w),
+                    Text('Add Image from Gallery', style: GoogleFonts.outfit(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp)),
+                  ]),
                 ),
-              );
-            }).toList()),
+              ),
+              _sp(14),
+              _lbl('SHAPES'),
+              // Category tabs
+              Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(14.r)),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(children: shapeCats.map((cat) {
+                    final isSel = shapeTab == cat;
+                    return GestureDetector(
+                      onTap: () {
+                        controller.shapeTab.value = cat;
+                        if (firebaseCats.contains(cat)) controller.loadShapeImages(cat);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+                        decoration: BoxDecoration(
+                          color: isSel ? const Color(0xFF008080) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: FittedBox(fit: BoxFit.scaleDown, child: Text(cat, style: GoogleFonts.outfit(
+                          color: isSel ? Colors.black : Colors.black38,
+                          fontWeight: FontWeight.bold, fontSize: 9.sp,
+                        ))),
+                      ),
+                    );
+                  }).toList()),
+                ),
+              ),
+              _sp(12),
+            ]),
           ),
-        ),
-        _sp(12),
-        if (shapeTab == 'General')
-          Wrap(spacing: 8.w, runSpacing: 8.h, children: [
-            _shpBtn('Circle', Icons.circle_outlined, 'circle'), _shpBtn('Rect', Icons.crop_square_rounded, 'rect'),
-            _shpBtn('Triangle', Icons.change_history_rounded, 'triangle'), _shpBtn('Star', Icons.star_border_rounded, 'star'),
-            _shpBtn('Hexagon', Icons.hexagon_outlined, 'hexagon'), _shpBtn('Pentagon', Icons.pentagon_outlined, 'pentagon'),
-            _shpBtn('Heart', Icons.favorite_border_rounded, 'heart'),
-          ])
-        else
-          Obx(() {
-            if (controller.isLoadingShapes.value) {
-              return Container(height: 120.h, alignment: Alignment.center, child: SizedBox(width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF008080))));
-            }
-            if (controller.currentShapeImages.isEmpty) {
-              return Center(child: Padding(padding: EdgeInsets.symmetric(vertical: 24.h),
-                child: Column(children: [Icon(Icons.image_outlined, color: Colors.black87.withOpacity(0.24), size: 40.sp), SizedBox(height: 10.h), Text('No shapes found', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp))])));
-            }
-            return Wrap(spacing: 10.w, runSpacing: 10.h, children: controller.currentShapeImages.map((url) {
-              return GestureDetector(
-                onTap: () => controller.addShapeImageFromUrl(url),
-                child: Container(
-                  width: 72.w, height: 72.w,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8E8EE),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: Colors.black87.withOpacity(0.12)),
-                    image: DecorationImage(image: NetworkImage(url), fit: BoxFit.contain),
-                  ),
-                ),
-              );
-            }).toList());
-          }),
-      ]));
-    }));
+          // Grid — full width, dark background
+          gridSection,
+          SizedBox(height: 16.h),
+        ]),
+      );
+    });
   }
 
   Widget _buildColorsPanel() {
@@ -1406,8 +1488,19 @@ class EditorView extends GetView<EditorViewModel> {
 
   Widget _shpBtn(String label, IconData icon, String type) => GestureDetector(
     onTap: () => controller.addShape(type),
-    child: Container(padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h), decoration: BoxDecoration(color: AppColors.cardDark, borderRadius: BorderRadius.circular(10.r), border: Border.all(color: Colors.black87.withOpacity(0.12))),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: Colors.black87.withOpacity(0.7), size: 16.sp), SizedBox(width: 6.w), Text(label, style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.7), fontSize: 11.sp))])),
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.cardDark,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: Colors.black87.withOpacity(0.12)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, color: Colors.black87.withOpacity(0.7), size: 16.sp),
+        SizedBox(width: 6.w),
+        Text(label, style: GoogleFonts.outfit(color: Colors.black87.withOpacity(0.7), fontSize: 11.sp)),
+      ]),
+    ),
   );
 
   Widget _actRow() => Row(children: [
@@ -1454,6 +1547,75 @@ class EditorView extends GetView<EditorViewModel> {
     // 3D Teal
     [const Color(0xFF004D4D), const Color(0xFF00A0A0), const Color(0xFF006666), const Color(0xFF008080)],
   ];
+
+  void _showTextEditDialog(int index) {
+    final element = controller.components[index];
+    final textController = TextEditingController(text: element.content);
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          'Edit Text',
+          style: GoogleFonts.outfit(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          maxLines: 3,
+          minLines: 1,
+          cursorColor: const Color(0xFF008080),
+          style: GoogleFonts.outfit(fontSize: 14.sp, color: Colors.black87),
+          decoration: InputDecoration(
+            hintText: 'Enter text...',
+            hintStyle: GoogleFonts.outfit(color: Colors.black38),
+            filled: true,
+            fillColor: const Color(0xFFF4F4F8),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xFF008080), width: 1.5),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newText = textController.text.trim();
+              if (newText.isNotEmpty) {
+                controller.updateSelectedElement((e) => e.copyWith(content: newText));
+              }
+              Get.back();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF008080),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            ),
+            child: Text('OK', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13.sp)),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
 
   void _showLayersSheet() {
     Get.bottomSheet(Container(
@@ -1729,3 +1891,11 @@ class _NoneColorPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+
+/// Simple data class for bottom nav tabs
+class _NavTab {
+  final String label;
+  final IconData icon;
+  final String id;
+  const _NavTab(this.label, this.icon, this.id);
+}

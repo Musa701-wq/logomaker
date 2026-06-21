@@ -37,8 +37,7 @@ class ProfileViewModel extends GetxController {
   
   // Saved assets thumbnails logic
   final List<String> savedAssets = [
-    'assets/images/logo1.jpg',
-    'assets/images/logo2.png',
+    'assets/images/logo.png',
   ];
 
   final RxBool isDarkMode = false.obs;

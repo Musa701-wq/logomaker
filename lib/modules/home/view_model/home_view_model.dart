@@ -37,10 +37,11 @@ class HomeViewModel extends GetxController {
 
   static const List<FolderSection> allSections = [
     FolderSection('Logos', 'musaf/logo', [
+      'spots', 'farmer', 'functions',
       'abstract', 'animals', 'butterfly', 'camera', 'car', 'circle', 'corporal',
-      'dog', 'farmer', 'festival', 'field', 'flowers', 'fly', 'functions',
+      'dog', 'festival', 'field', 'flowers', 'fly',
       'games', 'hallowean', 'heart', 'holiday', 'leaf', 'music', 'ngo',
-      'party', 'profession', 'restaurant', 'simple', 'social', 'spots',
+      'party', 'profession', 'restaurant', 'simple', 'social',
       'square', 'star', 'text', 'tools', 'toy', 'video',
     ]),
   ];

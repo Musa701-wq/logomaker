@@ -117,12 +117,12 @@ class WelcomeBannerView extends GetView<WelcomeBannerViewModel> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Video placeholder — replace with your video player widget
-            Container(
-              color: Colors.black,
-              child: Center(
-                child: Icon(Icons.play_circle_outline_rounded, color: Colors.white.withValues(alpha: 0.5), size: 48.sp),
-              ),
+            // Banner image
+            Image.asset(
+              'assets/images/banner.png',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
             // Gradient overlay
             Positioned(

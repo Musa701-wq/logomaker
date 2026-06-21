@@ -45,7 +45,7 @@ class AboutView extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20.r),
                   child: Image.asset(
-                    'assets/images/logo1.jpg',
+                    'assets/images/logo.png',
                     width: 80.w,
                     height: 80.w,
                     fit: BoxFit.cover,

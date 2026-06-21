@@ -45,7 +45,7 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(60.r),
                       child: Image.asset(
-                        'assets/images/logo1.jpg', // Placeholder, in real app would use user photo url
+                        'assets/images/logo.png', // Placeholder, in real app would use user photo url
                         fit: BoxFit.cover,
                       ),
                     ),

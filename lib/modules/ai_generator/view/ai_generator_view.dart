@@ -543,7 +543,7 @@ class AIGeneratorView extends GetView<AIGeneratorViewModel> {
           width: 140.w, margin: EdgeInsets.only(right: 12.w),
           decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(16.r), border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.withOpacity(0.1)),
-            image: DecorationImage(image: AssetImage('assets/images/logo${text == "Kids" ? 1 : 2}.jpg'), fit: BoxFit.cover, opacity: 0.1),
+            image: DecorationImage(image: const AssetImage('assets/images/logo.png'), fit: BoxFit.cover, opacity: 0.1),
           ),
           alignment: Alignment.bottomLeft, padding: EdgeInsets.all(12.w),
           child: Text(text, style: GoogleFonts.outfit(color: isSelected ? AppColors.primary : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13.sp)),

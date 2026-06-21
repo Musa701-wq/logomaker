@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import '../../../app/services/storage_service.dart';
+import '../../../app/utils/text_label_patterns.dart';
 import '../../../models/editor_element.dart';
 import '../../history/view_model/history_view_model.dart';
 
@@ -195,8 +196,8 @@ class EditorViewModel extends GetxController {
       components.clear();
       selectedIndex.value = -1;
 
-      // Match the new light theme: white background
-      backgroundColor.value = Colors.white;
+      // Match home card background color
+      backgroundColor.value = const Color(0xFF1E2336);
 
       final imgElement = EditorElement(
         id: DateTime.now().millisecondsSinceEpoch.toString() + '_img',
@@ -207,23 +208,26 @@ class EditorViewModel extends GetxController {
         opacity: 1.0,
       );
 
+      // Pick pattern — use patternIndex from args if provided, else derive from image URL
+      final int pIdx = args['patternIndex'] as int? ??
+          patternIndexFor(args['templateImage'] as String? ?? '');
+      final p = kTextLabelPatterns[pIdx];
+
       final txtElement = EditorElement(
         id: DateTime.now().millisecondsSinceEpoch.toString() + '_txt',
         type: ElementType.text,
-        position: const Offset(20, 270),
-        content: args['templateText'] ?? 'Esport',
+        position: p.position,
+        content: args['templateText'] ?? 'Logo',
         scale: 1.0,
-        fontSize: 52,
-        color: args['templateTextColor'] != null
-            ? Color(int.parse(args['templateTextColor'] as String))
-            : Colors.white,
-        fontFamily: 'Oswald',
-        fontWeight: FontWeight.w900,
-        letterSpacing: 4.0,
-        outlineColor: const Color(0xFF008080),
-        outlineWidth: 3.0,
-        glowColor: const Color(0xFF008080),
-        glowRadius: 10.0,
+        fontSize: p.fontSize,
+        color: p.color,
+        fontFamily: p.fontFamily,
+        fontWeight: p.fontWeight,
+        letterSpacing: p.letterSpacing,
+        outlineColor: p.outlineColor,
+        outlineWidth: p.outlineWidth,
+        glowColor: p.glowColor,
+        glowRadius: p.glowRadius,
       );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

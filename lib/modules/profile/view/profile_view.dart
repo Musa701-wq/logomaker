@@ -46,7 +46,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                     CircleAvatar(
                       radius: 20.r,
                       backgroundColor: const Color(0xFF008080).withOpacity(0.1),
-                      backgroundImage: const AssetImage('assets/images/logo1.jpg'),
+                      backgroundImage: const AssetImage('assets/images/logo.png'),
                     ),
                   ],
                 ),
@@ -84,7 +84,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(25.r),
                               child: Image.asset(
-                                'assets/images/logo1.jpg',
+                                'assets/images/logo.png',
                                 width: 100.w,
                                 height: 100.w,
                                 fit: BoxFit.cover,

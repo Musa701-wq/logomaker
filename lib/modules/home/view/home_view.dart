@@ -8,8 +8,8 @@ import '../../history/view/history_view.dart';
 import '../../profile/view/profile_view.dart';
 import '../../credits/view/credits_view.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../app/widgets/shimmer_loading.dart';
 import '../../../app/widgets/cached_image.dart';
+import '../../../app/utils/text_label_patterns.dart';
 import 'category_grid_view.dart';
 
 class HomeView extends GetView<HomeViewModel> {
@@ -108,10 +108,10 @@ class HomeView extends GetView<HomeViewModel> {
           SliverToBoxAdapter(child: SizedBox(height: 8.h)),
           SliverToBoxAdapter(child: _buildTopCategoriesRow()),
           SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-          for (final folderName in section.folders)
-            if (controller.folderData.containsKey(folderName)) ...[
+          for (int i = 0; i < section.folders.length; i++)
+            if (controller.folderData.containsKey(section.folders[i])) ...[
               SliverToBoxAdapter(
-                child: _buildFolderSection(folderName, '${section.storagePrefix}/$folderName'),
+                child: _buildFolderSection(section.folders[i], '${section.storagePrefix}/${section.folders[i]}', i),
               ),
               SliverToBoxAdapter(child: SizedBox(height: 20.h)),
             ],
@@ -175,9 +175,10 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
-  Widget _buildFolderSection(String folderName, String storagePath) {
+  Widget _buildFolderSection(String folderName, String storagePath, int folderIndex) {
     final items = controller.folderData[folderName] ?? [];
     if (items.isEmpty) return const SizedBox.shrink();
+    final titleStyle = _uniformTitleStyle();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +188,7 @@ class HomeView extends GetView<HomeViewModel> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(folderName, style: GoogleFonts.outfit(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              Text(_folderTitle(folderName), style: titleStyle),
               SizedBox(width: 8.w),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
@@ -199,11 +200,12 @@ class HomeView extends GetView<HomeViewModel> {
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () async {
-                  final allItems = await controller.getAllImagesFromFolder(storagePath);
-                  if (allItems.isNotEmpty) {
-                    Get.to(() => CategoryGridView(title: folderName, items: allItems));
-                  }
+                onTap: () {
+                  Get.to(() => CategoryGridView(
+                    title: folderName,
+                    items: const [],
+                    storagePath: storagePath,
+                  ));
                 },
                 child: Text('View All', style: GoogleFonts.outfit(color: Colors.grey, fontSize: 13.sp, fontWeight: FontWeight.w500)),
               ),
@@ -221,11 +223,15 @@ class HomeView extends GetView<HomeViewModel> {
             itemBuilder: (context, index) {
               final project = items[index];
               return GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
-                  'templateImage': project['image'],
-                  'templateText': project['title'],
-                  'templateTextColor': project['textColor'],
-                }),
+                onTap: () {
+                  final patternIdx = patternIndexFor(project['image'] ?? folderName);
+                  Get.toNamed(AppRoutes.editor, arguments: {
+                    'templateImage': project['image'],
+                    'templateText': _folderTitle(folderName),
+                    'templateTextColor': project['textColor'],
+                    'patternIndex': patternIdx,
+                  });
+                },
                 child: Container(
                   width: 110.w,
                   margin: EdgeInsets.only(right: 12.w),
@@ -257,15 +263,28 @@ class HomeView extends GetView<HomeViewModel> {
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
-                            padding: EdgeInsets.only(bottom: 12.h, left: 8.w, right: 8.w),
-                            child: Text(
-                              folderName,
-                              style: GoogleFonts.outfit(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                            ),
+                            padding: EdgeInsets.only(bottom: 10.h, left: 6.w, right: 6.w),
+                            child: Builder(builder: (_) {
+                              final p = patternFor(project['image'] ?? folderName);
+                              return Text(
+                                _folderTitle(folderName),
+                                style: GoogleFonts.getFont(
+                                  p.fontFamily,
+                                  fontWeight: p.fontWeight,
+                                  color: p.color,
+                                  fontSize: 11.sp,
+                                  letterSpacing: p.letterSpacing.clamp(0, 2),
+                                  shadows: p.glowRadius > 0
+                                      ? [Shadow(color: p.glowColor, blurRadius: p.glowRadius)]
+                                      : null,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            }),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -437,7 +456,7 @@ class HomeView extends GetView<HomeViewModel> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(18.r),
                       child: Image.asset(
-                        'assets/images/logo1.jpg',
+                        'assets/images/logo.png',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -617,36 +636,109 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
+  // 10 rotating text style patterns for folder section titles — REMOVED
+  // Now using uniform title style
+
+  TextStyle _uniformTitleStyle() => GoogleFonts.outfit(
+        color: Colors.black87,
+        fontSize: 18.sp,
+        fontWeight: FontWeight.bold,
+      );
+  String _folderTitle(String name) {
+    const map = {
+      'abstract': 'Abstract',
+      'animals': 'Animals',
+      'butterfly': 'Butterfly',
+      'camera': 'Camera',
+      'car': 'Car',
+      'circle': 'Circle',
+      'corporal': 'Corporal',
+      'dog': 'Dog',
+      'farmer': 'Farmer',
+      'festival': 'Festival',
+      'field': 'Field',
+      'flowers': 'Flowers',
+      'fly': 'Fly',
+      'functions': 'Functions',
+      'games': 'Games',
+      'hallowean': 'Halloween',
+      'heart': 'Heart',
+      'holiday': 'Holiday',
+      'leaf': 'Leaf',
+      'music': 'Music',
+      'ngo': 'NGO',
+      'party': 'Party',
+      'profession': 'Profession',
+      'restaurant': 'Restaurant',
+      'simple': 'Simple',
+      'social': 'Social',
+      'spots': 'Sports',
+      'square': 'Square',
+      'star': 'Star',
+      'text': 'Text',
+      'tools': 'Tools',
+      'toy': 'Toy',
+      'video': 'Video',
+    };
+    return map[name] ?? name[0].toUpperCase() + name.substring(1);
+  }
+
   Widget _buildShimmerSections() {
+    final folders = HomeViewModel.allSections.isNotEmpty
+        ? HomeViewModel.allSections.first.folders
+        : <String>[];
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.only(top: 20.h),
       child: Column(
-        children: List.generate(4, (i) => Padding(
-          padding: EdgeInsets.only(bottom: 24.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: ShimmerLoading(width: 140.w, height: 16.h, borderRadius: 4),
-              ),
-              SizedBox(height: 16.h),
-              SizedBox(
-                height: 140.h,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  itemCount: 5,
-                  itemBuilder: (_, __) => Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.w),
-                    child: ShimmerLoading(width: 120.w, height: 140.h, borderRadius: 12),
+        children: folders.asMap().entries.map((entry) {
+          final i = entry.key;
+          final folderName = entry.value;
+          return Padding(
+            padding: EdgeInsets.only(bottom: 24.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Text(
+                    _folderTitle(folderName),
+                    style: _uniformTitleStyle(),
                   ),
                 ),
-              ),
-            ],
-          ),
-        )),
+                SizedBox(height: 16.h),
+                SizedBox(
+                  height: 110.w,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    itemCount: 5,
+                    itemBuilder: (_, __) => Container(
+                      width: 110.w,
+                      margin: EdgeInsets.only(right: 12.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E2336),
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFFBDBDBD),
+                          ),
+                         ),
+                      ),
+                    ),
+                  ),
+                ), 
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }

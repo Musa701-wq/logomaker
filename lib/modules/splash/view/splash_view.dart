@@ -50,18 +50,29 @@ class SplashView extends GetView<SplashViewModel> {
                     );
                   },
                   child: Container(
-                    width: 100.w,
-                    height: 100.w,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF008080),
+                    width: 110.w,
+                    height: 110.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(28)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF008080).withValues(alpha: 0.2),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                    child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 50.sp),
+                    padding: EdgeInsets.all(14.w),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 SizedBox(height: 32.h),
                 Text(
-                  'ATELIER',
+                  'LOGO MAKER',
                   style: GoogleFonts.outfit(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.w900,
