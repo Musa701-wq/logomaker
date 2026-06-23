@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../app/widgets/cached_image.dart';
 import '../view_model/home_view_model.dart';
+import 'premium_dialog.dart';
 
 class CategoryGridView extends StatefulWidget {
   final String title;
@@ -93,12 +94,19 @@ class _CategoryGridViewState extends State<CategoryGridView> {
                   itemCount: _items.length,
                   itemBuilder: (context, index) {
                     final project = _items[index];
+                    final isLocked = index >= 3;
                     return GestureDetector(
-                      onTap: () => Get.toNamed(AppRoutes.editor, arguments: {
-                        'templateImage': project['image'],
-                        'templateText': project['title'],
-                        'templateTextColor': project['textColor'],
-                      }),
+                      onTap: () {
+                        if (isLocked) {
+                          Get.dialog(const PremiumHomeBanner());
+                        } else {
+                          Get.toNamed(AppRoutes.editor, arguments: {
+                            'templateImage': project['image'],
+                            'templateText': project['title'],
+                            'templateTextColor': project['textColor'],
+                          });
+                        }
+                      },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.r),
                         child: Stack(
@@ -129,6 +137,19 @@ class _CategoryGridViewState extends State<CategoryGridView> {
                                 ),
                               ),
                             ),
+                            if (isLocked)
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.45),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Center(
+                                    child: Icon(Icons.lock_rounded,
+                                        color: Colors.white70, size: 24.sp),
+                                  ),
+                                ),
+                              ),
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: Padding(

@@ -63,7 +63,7 @@ class SubscriptionData extends GetxService {
       price: '\$9.99',
       period: '/month',
       features: ['Everything in Weekly', 'Background removal', 'Priority support', 'Custom templates'],
-      isPopular: true,
+      isPopular: false,
       color: 0xFF008080,
     ),
     SubscriptionPlan(
