@@ -7,6 +7,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../app/utils/color_constants.dart';
 import '../view_model/profile_view_model.dart';
 import '../../home/view_model/home_view_model.dart';
+import '../../../app/services/purchase_service.dart';
 
 class ProfileView extends GetView<ProfileViewModel> {
   const ProfileView({super.key});
@@ -19,40 +20,6 @@ class ProfileView extends GetView<ProfileViewModel> {
         child: Obx(() => CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    ShaderMask(
-                      blendMode: BlendMode.srcIn,
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [const Color(0xFF008080), const Color(0xFF008080)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        'The Ethereal Studio',
-                        style: GoogleFonts.outfit(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    CircleAvatar(
-                      radius: 20.r,
-                      backgroundColor: const Color(0xFF008080).withOpacity(0.1),
-                      backgroundImage: const AssetImage('assets/images/logo.png'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Profile Header Card (gradient banner style)
             SliverToBoxAdapter(
               child: Padding(
@@ -92,27 +59,31 @@ class ProfileView extends GetView<ProfileViewModel> {
                             ),
                           ),
                           if (!controller.isGuest.value)
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              child: Text(
-                                'PRO',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF008080),
+                            Obx(() {
+                              final subscribed = _isSubscribed();
+                              if (!subscribed) return const SizedBox.shrink();
+                              return Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.r),
                                 ),
-                              ),
-                            ),
+                                child: Text(
+                                  'PRO',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF008080),
+                                  ),
+                                ),
+                              );
+                            }),
                         ],
                       ),
                       SizedBox(height: 12.h),
                       if (controller.isGuest.value) ...[
                         Text(
-                          'Welcome to Atelier',
+                          'Welcome to Logo Maker',
                           style: GoogleFonts.outfit(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -169,29 +140,33 @@ class ProfileView extends GetView<ProfileViewModel> {
                           ),
                         ),
                         SizedBox(height: 16.h),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(color: Colors.white.withOpacity(0.4)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 16.sp),
-                              SizedBox(width: 8.w),
-                              Text(
-                                'PREMIUM MEMBER',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 11.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                        Obx(() {
+                          final subscribed = _isSubscribed();
+                          if (!subscribed) return const SizedBox.shrink();
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20.r),
+                              border: Border.all(color: Colors.white.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 16.sp),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  'PREMIUM MEMBER',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              ],
+                            ),
+                          );
+                        }),
                       ],
                     ],
                   ),
@@ -211,58 +186,137 @@ class ProfileView extends GetView<ProfileViewModel> {
                       borderRadius: BorderRadius.circular(25.r),
                       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4))],
                     ),
-                    child: InkWell(
-                      onTap: () => Get.find<HomeViewModel>().selectedIndex.value = 2,
-                      borderRadius: BorderRadius.circular(25.r),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(10.w),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF008080).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                child: Icon(Icons.subscriptions_rounded, color: const Color(0xFF008080), size: 20.sp),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header row
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF008080).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              SizedBox(width: 16.w),
-                              Text('Subscription Plan', style: GoogleFonts.outfit(fontSize: 17.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
-                              const Spacer(),
-                              Text('MANAGE', style: GoogleFonts.outfit(fontSize: 12.sp, fontWeight: FontWeight.bold, color: const Color(0xFF008080))),
-                            ],
-                          ),
-                          SizedBox(height: 16.h),
-                          Container(
+                              child: Icon(Icons.workspace_premium_rounded,
+                                  color: const Color(0xFF008080), size: 20.sp),
+                            ),
+                            SizedBox(width: 14.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Subscription Plan',
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87)),
+                                Text('Your current plan',
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 11.sp,
+                                        color: Colors.black38)),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        // Plan details — driven by PurchaseService
+                        Obx(() {
+                          final ps = Get.find<HomeViewModel>();
+                          final isGuest = ps.isGuest.value;
+                          // Try to get active plan title from PurchaseService
+                          String planName = 'Free Plan';
+                          String planDesc = 'Upgrade to unlock all premium features and HD export.';
+                          double progress = 0.15;
+                          try {
+                            final purchaseService = Get.find<dynamic>();
+                            // ignore if not found
+                          } catch (_) {}
+                          if (!isGuest) {
+                            planName = 'Premium';
+                            planDesc = 'You have full access to all premium features.';
+                            progress = 1.0;
+                          }
+                          return Container(
+                            width: double.infinity,
                             padding: EdgeInsets.all(16.w),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8F9FA),
-                              borderRadius: BorderRadius.circular(16.r),
+                              color: const Color(0xFFF4F4F8),
+                              borderRadius: BorderRadius.circular(14.r),
                             ),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Monthly Premium', style: GoogleFonts.outfit(fontSize: 13.sp, color: Colors.black54)),
-                                    Text('\$24.99/mo', style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color(0xFF008080))),
+                                    Text(planName,
+                                        style: GoogleFonts.outfit(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87)),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                                      decoration: BoxDecoration(
+                                        color: isGuest
+                                            ? Colors.grey.withOpacity(0.12)
+                                            : const Color(0xFF008080).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6.r),
+                                      ),
+                                      child: Text(
+                                        isGuest ? 'FREE' : 'ACTIVE',
+                                        style: GoogleFonts.outfit(
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: isGuest
+                                                ? Colors.black45
+                                                : const Color(0xFF008080)),
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                SizedBox(height: 12.h),
+                                SizedBox(height: 10.h),
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderRadius: BorderRadius.circular(6.r),
                                   child: LinearProgressIndicator(
-                                    value: 0.75,
-                                    minHeight: 6.h,
+                                    value: progress,
+                                    minHeight: 5.h,
                                     backgroundColor: Colors.grey.withOpacity(0.15),
-                                    valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF008080)),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        isGuest ? Colors.grey.shade400 : const Color(0xFF008080)),
                                   ),
                                 ),
+                                SizedBox(height: 8.h),
+                                Text(planDesc,
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 11.sp,
+                                        color: Colors.black45,
+                                        height: 1.4)),
                               ],
                             ),
+                          );
+                        }),
+                        SizedBox(height: 14.h),
+                        // View plans button — navigates to Credits tab
+                        GestureDetector(
+                          onTap: () =>
+                              Get.find<HomeViewModel>().selectedIndex.value = 2,
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(vertical: 13.h),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF008080),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Center(
+                              child: Text('View Plans',
+                                  style: GoogleFonts.outfit(
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -284,9 +338,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                       children: [
                         _buildSettingsRow(Icons.person_outline_rounded, 'Personal Information', 'Manage name and contact details', onTap: () => Get.toNamed('/personal-info')),
                         _buildDivider(),
-                        _buildSettingsRow(Icons.info_outline_rounded, 'About Us', 'Learn more about Atelier Studio', onTap: () => Get.toNamed(AppRoutes.about)),
-                        _buildDivider(),
-                        _buildSettingsRow(Icons.payment_rounded, 'Payment Methods', 'Manage your cards and billing', onTap: () {}),
+                        _buildSettingsRow(Icons.info_outline_rounded, 'About Us', 'Learn more about Logo Maker', onTap: () => Get.toNamed(AppRoutes.about)),
                       ],
                     ),
                   ),
@@ -369,6 +421,14 @@ class ProfileView extends GetView<ProfileViewModel> {
         )),
       ),
     );
+  }
+
+  bool _isSubscribed() {
+    try {
+      return PurchaseService.to.isSubscribed.value;
+    } catch (_) {
+      return false;
+    }
   }
 
   void _showDeleteDialog() {

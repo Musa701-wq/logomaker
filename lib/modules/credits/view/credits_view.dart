@@ -17,7 +17,6 @@ class CreditsView extends GetView<CreditsViewModel> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            _buildHeader(),
             SizedBox(height: 20.h),
             _buildSubscriptionCard(),
             SizedBox(height: 30.h),
@@ -36,7 +35,7 @@ class CreditsView extends GetView<CreditsViewModel> {
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
       child: Center(
         child: Text(
-          'Digital Atelier',
+          'Logo Maker',
           style: GoogleFonts.outfit(
             fontSize: 20.sp,
             fontWeight: FontWeight.w700,
@@ -232,11 +231,13 @@ class CreditsView extends GetView<CreditsViewModel> {
             ),
           ),
           SizedBox(height: 20.h),
-          ...controller.plans.asMap().entries.map((entry) {
-            final index = entry.key;
-            final plan = entry.value;
-            return _buildPlanCard(plan, index);
-          }),
+          Obx(() => Column(
+            children: controller.plans.asMap().entries.map((entry) {
+              final index = entry.key;
+              final plan = entry.value;
+              return _buildPlanCard(plan, index);
+            }).toList(),
+          )),
         ],
       ),
     );

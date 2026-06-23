@@ -10,7 +10,485 @@ import '../../credits/view/credits_view.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../app/widgets/cached_image.dart';
 import '../../../app/utils/text_label_patterns.dart';
+import '../../../app/data/subscription_data.dart';
+import '../../../app/services/purchase_service.dart';
 import 'category_grid_view.dart';
+
+// ── Marquee premium banner ──────────────────────────────────────────────────
+class _HomeMarqueeBanner extends StatefulWidget {
+  const _HomeMarqueeBanner();
+
+  @override
+  State<_HomeMarqueeBanner> createState() => _HomeMarqueeBannerState();
+}
+
+class _HomeMarqueeBannerState extends State<_HomeMarqueeBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  final GlobalKey _textKey = GlobalKey();
+  double _textWidth = 0;
+
+  static const _text =
+      '✨ Unlock 500+ templates  •  HD export  •  No watermark  •  Premium fonts  ';
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 14),
+    )..repeat();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final box = _textKey.currentContext?.findRenderObject() as RenderBox?;
+      if (box != null && mounted) {
+        setState(() => _textWidth = box.size.width);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scrollDist = _textWidth > 0 ? _textWidth + 24.w : 400.w;
+    return GestureDetector(
+      onTap: () => _showPremiumBanner(context),
+      child: Container(
+        width: double.infinity,
+        height: 44.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF004D4D), Color(0xFF008080), Color(0xFF00A3A3)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008080).withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (_, __) {
+            return Transform.translate(
+              offset: Offset(-_ctrl.value * scrollDist, 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildItem(),
+                  _buildItem(),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItem() => SizedBox(
+        height: 44.h,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(width: 24.w),
+            Icon(Icons.auto_awesome_rounded,
+                color: const Color(0xFFFFD700), size: 14.sp),
+            SizedBox(width: 8.w),
+            Text(
+              _text,
+              key: _textWidth == 0 ? _textKey : null,
+              style: GoogleFonts.outfit(
+                fontSize: 12.sp,
+                height: 1.2,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              textHeightBehavior: const TextHeightBehavior(
+                applyHeightToFirstAscent: false,
+                applyHeightToLastDescent: false,
+              ),
+            ),
+            SizedBox(width: 24.w),
+          ],
+        ),
+      );
+
+  void _showPremiumBanner(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (_) => _PremiumHomeBanner(),
+    );
+  }
+}
+
+// ── Full-screen premium promotion banner (4 feature tiles) ──────────────────
+class _PremiumHomeBanner extends StatefulWidget {
+  const _PremiumHomeBanner();
+
+  @override
+  State<_PremiumHomeBanner> createState() => _PremiumHomeBannerState();
+}
+
+class _PremiumHomeBannerState extends State<_PremiumHomeBanner>
+    with SingleTickerProviderStateMixin {
+  static const _features = [
+    {'icon': Icons.grid_view_rounded,     'title': 'Unlimited Templates', 'sub': '500+ pro designs'},
+    {'icon': Icons.high_quality_rounded,  'title': 'HD Export',           'sub': 'Crystal-clear quality'},
+    {'icon': Icons.water_drop_outlined,   'title': 'No Watermark',        'sub': 'Clean, brand-ready logos'},
+    {'icon': Icons.font_download_rounded, 'title': 'All Fonts',           'sub': '80+ premium typefaces'},
+  ];
+
+  late final AnimationController _btnAnimCtrl;
+  late final Animation<double> _btnAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _btnAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+    _btnAnim = Tween<double>(begin: 0, end: 6).animate(
+      CurvedAnimation(parent: _btnAnimCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _btnAnimCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D1117),
+          borderRadius: BorderRadius.circular(28.r),
+          border: Border.all(
+              color: const Color(0xFF008080).withValues(alpha: 0.3), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008080).withValues(alpha: 0.15),
+              blurRadius: 40,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Header with decorative glow ──
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(24.w, 30.h, 24.w, 24.h),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF004D4D), Color(0xFF008080), Color(0xFF00A3A3)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Decorative glow circles
+                  Positioned(
+                    right: -20.w, top: -20.h,
+                    child: Container(
+                      width: 80.w, height: 80.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFFFD700).withValues(alpha: 0.08),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: -10.w, bottom: -10.h,
+                    child: Container(
+                      width: 50.w, height: 50.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.04),
+                      ),
+                    ),
+                  ),
+                  Column(children: [
+                    Container(
+                      padding: EdgeInsets.all(10.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFD700).withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(Icons.workspace_premium_rounded,
+                          color: const Color(0xFFFFD700), size: 30.sp),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      'Unlock Everything',
+                      style: GoogleFonts.outfit(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Get access to all premium features',
+                      style: GoogleFonts.outfit(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w400),
+                      textAlign: TextAlign.center,
+                    ),
+                  ]),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 20.h),
+
+            // ── 2×2 feature grid ──
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10.h,
+                  crossAxisSpacing: 10.w,
+                  childAspectRatio: 2.2,
+                ),
+                itemCount: _features.length,
+                itemBuilder: (_, i) {
+                  final f = _features[i];
+                  return Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF008080).withValues(alpha: 0.1),
+                          const Color(0xFF008080).withValues(alpha: 0.04),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14.r),
+                      border: Border.all(
+                          color: const Color(0xFF008080).withValues(alpha: 0.2)),
+                    ),
+                    child: Row(children: [
+                      Container(
+                        padding: EdgeInsets.all(6.w),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF008080).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(f['icon'] as IconData,
+                            color: const Color(0xFF00B3B3), size: 16.sp),
+                      ),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              f['title'] as String,
+                              style: GoogleFonts.outfit(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              f['sub'] as String,
+                              style: GoogleFonts.outfit(
+                                  fontSize: 9.sp, color: Colors.white38),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ]),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 16.h),
+
+            // ── Weekly price card ──
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF008080).withValues(alpha: 0.12),
+                      const Color(0xFF008080).withValues(alpha: 0.04),
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(
+                      color: const Color(0xFF008080).withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFD700).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Icon(Icons.star_rounded,
+                          color: const Color(0xFFFFD700), size: 18.sp),
+                    ),
+                    SizedBox(width: 12.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Weekly Plan',
+                            style: GoogleFonts.outfit(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        Text('Cancel anytime',
+                            style: GoogleFonts.outfit(
+                                fontSize: 11.sp,
+                                color: const Color(0xFF00B3B3),
+                                fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('\$4.99',
+                            style: GoogleFonts.outfit(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        Text('per week',
+                            style: GoogleFonts.outfit(
+                                fontSize: 10.sp, color: Colors.white38)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: 16.h),
+
+            // ── Purchase button with bounce animation ──
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: AnimatedBuilder(
+                animation: _btnAnimCtrl,
+                builder: (_, child) => Transform.translate(
+                  offset: Offset(0, -_btnAnim.value),
+                  child: child,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50.h,
+                  child: Obx(() {
+                    final ps = Get.find<PurchaseService>();
+                    final isPurchasing = ps.isPurchasing.value;
+                    return ElevatedButton(
+                      onPressed: isPurchasing ? null : () async {
+                        final plan = SubscriptionData.to.plans.firstWhere(
+                          (p) => p.productId == 'com.xenderservices.logo.maker.weekly',
+                          orElse: () => SubscriptionData.to.plans.first,
+                        );
+                        await ps.purchasePlan(plan);
+                        if (ps.isSubscribed.value && Get.isDialogOpen == true) {
+                          Get.back();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00A3A3),
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: const Color(0xFF00A3A3).withValues(alpha: 0.6),
+                        elevation: 4,
+                        shadowColor: const Color(0xFF008080).withValues(alpha: 0.4),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r)),
+                      ),
+                      child: isPurchasing
+                          ? SizedBox(
+                              width: 22.sp, height: 22.sp,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ))
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.auto_awesome_rounded, size: 18.sp),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  'Get Premium Now',
+                                  style: GoogleFonts.outfit(
+                                      fontSize: 15.sp, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 4.h),
+
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text('Maybe later',
+                  style: GoogleFonts.outfit(
+                      fontSize: 12.sp,
+                      color: Colors.white24,
+                      fontWeight: FontWeight.w500)),
+            ),
+            SizedBox(height: 6.h),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class HomeView extends GetView<HomeViewModel> {
   const HomeView({super.key});
@@ -32,9 +510,12 @@ class HomeView extends GetView<HomeViewModel> {
           color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.bold, letterSpacing: 0.5,
         )),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.black87, size: 24.sp),
-            onPressed: () => _showSearch(),
+          Obx(() => controller.selectedIndex.value == 0
+            ? IconButton(
+                icon: Icon(Icons.search, color: Colors.black87, size: 24.sp),
+                onPressed: () => _showSearch(),
+              )
+            : const SizedBox.shrink(),
           ),
           Obx(() => controller.isGuest.value
             ? Padding(
@@ -105,9 +586,11 @@ class HomeView extends GetView<HomeViewModel> {
       return CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-          SliverToBoxAdapter(child: _buildTopCategoriesRow()),
-          SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+          // Promotional marquee banner
+          SliverToBoxAdapter(child: const _HomeMarqueeBanner()),
+          SliverToBoxAdapter(child: SizedBox(height: 12.h)),
+          // SliverToBoxAdapter(child: _buildTopCategoriesRow()),
+          // SliverToBoxAdapter(child: SizedBox(height: 24.h)),
           for (int i = 0; i < section.folders.length; i++)
             if (controller.folderData.containsKey(section.folders[i])) ...[
               SliverToBoxAdapter(
@@ -219,7 +702,7 @@ class HomeView extends GetView<HomeViewModel> {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: items.length,
+            itemCount: items.length > 8 ? 8 : items.length,
             itemBuilder: (context, index) {
               final project = items[index];
               return GestureDetector(
@@ -247,11 +730,18 @@ class HomeView extends GetView<HomeViewModel> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        CachedImage(
-                          project['image']!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(color: Colors.grey[800]),
-                        ),
+                        project['isAsset'] == 'true'
+                            ? Image.asset(
+                                project['image']!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              )
+                            : CachedImage(
+                                project['image']!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(color: Colors.grey[800]),
+                              ),
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -540,13 +1030,10 @@ class HomeView extends GetView<HomeViewModel> {
                     Get.back();
                     Get.toNamed(AppRoutes.rateUs);
                   }),
-                  _buildDrawerTile(Icons.share_rounded, 'Share App', onTap: () {
-                    Get.back();
-                    Get.snackbar('Share App', 'Sharing options coming soon!', snackPosition: SnackPosition.BOTTOM);
-                  }),
+                  // _buildDrawerTile(Icons.share_rounded, 'Share App', onTap: () {}),
                   _buildDrawerTile(Icons.support_agent_rounded, 'Customer Support', onTap: () {
                     Get.back();
-                    Get.snackbar('Support', 'Support coming soon!', snackPosition: SnackPosition.BOTTOM);
+                    Get.toNamed(AppRoutes.customerSupport);
                   }),
 
                   SizedBox(height: 8.h),
@@ -569,7 +1056,7 @@ class HomeView extends GetView<HomeViewModel> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
               child: Text(
-                '© 2026 Atelier Studio. All rights reserved.',
+                '© 2026 Logo Maker — Zencakeus',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
                   fontSize: 10.sp,
@@ -809,38 +1296,65 @@ class _TemplateSearchDelegate extends SearchDelegate<String> {
       itemBuilder: (_, i) {
         final folder = results[i];
         final images = controller.folderData[folder] ?? [];
-        return Container(
-          margin: EdgeInsets.only(bottom: 12.h),
-          padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.black.withOpacity(0.06)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48.w, height: 48.w,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008080).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10.r),
+        final section = HomeViewModel.allSections.first;
+        final storagePath = '${section.storagePrefix}/$folder';
+        final firstImage = images.isNotEmpty ? images.first : null;
+
+        return GestureDetector(
+          onTap: () {
+            close(context, folder);
+            Get.to(() => CategoryGridView(
+              title: folder,
+              items: const [],
+              storagePath: storagePath,
+            ));
+          },
+          child: Container(
+            margin: EdgeInsets.only(bottom: 12.h),
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: Colors.black.withOpacity(0.06)),
+            ),
+            child: Row(
+              children: [
+                // Thumbnail
+                Container(
+                  width: 56.w, height: 56.w,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF008080).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: firstImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10.r),
+                          child: firstImage['isAsset'] == 'true'
+                              ? Image.asset(firstImage['image']!, fit: BoxFit.cover)
+                              : Image.network(firstImage['image']!, fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 24.sp)),
+                        )
+                      : Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 24.sp),
                 ),
-                child: images.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10.r),
-                        child: Image.network(images.first['image'] ?? '', fit: BoxFit.cover),
-                      )
-                    : Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 24.sp),
-              ),
-              SizedBox(width: 14.w),
-              Text(folder, style: GoogleFonts.outfit(
-                fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.black87,
-              )),
-              const Spacer(),
-              Text('${images.length}', style: GoogleFonts.outfit(
-                fontSize: 12.sp, color: Colors.black38,
-              )),
-            ],
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        folder[0].toUpperCase() + folder.substring(1),
+                        style: GoogleFonts.outfit(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                      Text(
+                        '${images.length} templates',
+                        style: GoogleFonts.outfit(fontSize: 11.sp, color: Colors.black38),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, color: Colors.black26, size: 14.sp),
+              ],
+            ),
           ),
         );
       },
@@ -849,29 +1363,79 @@ class _TemplateSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final suggestions = _filteredFolders();
     if (query.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.search_rounded, color: Colors.black26, size: 48.sp),
-            SizedBox(height: 12.h),
-            Text('Search logo categories', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 14.sp)),
-          ],
-        ),
+      // Show all categories when search is empty
+      final allFolders = HomeViewModel.allSections.expand((s) => s.folders).toList();
+      return ListView.builder(
+        padding: EdgeInsets.all(16.w),
+        itemCount: allFolders.length,
+        itemBuilder: (_, i) {
+          final folder = allFolders[i];
+          final images = controller.folderData[folder] ?? [];
+          final firstImage = images.isNotEmpty ? images.first : null;
+          return ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            leading: Container(
+              width: 40.w, height: 40.w,
+              decoration: BoxDecoration(
+                color: const Color(0xFF008080).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: firstImage != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: firstImage['isAsset'] == 'true'
+                          ? Image.asset(firstImage['image']!, fit: BoxFit.cover)
+                          : Image.network(firstImage['image']!, fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 20.sp)),
+                    )
+                  : Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 20.sp),
+            ),
+            title: Text(
+              folder[0].toUpperCase() + folder.substring(1),
+              style: GoogleFonts.outfit(color: Colors.black87, fontSize: 14.sp, fontWeight: FontWeight.w500),
+            ),
+            trailing: Icon(Icons.north_west_rounded, color: Colors.black26, size: 16.sp),
+            onTap: () {
+              query = folder;
+              showResults(context);
+            },
+          );
+        },
       );
     }
+
+    final suggestions = _filteredFolders();
     return ListView.builder(
       padding: EdgeInsets.all(16.w),
       itemCount: suggestions.length,
       itemBuilder: (_, i) {
         final folder = suggestions[i];
+        final images = controller.folderData[folder] ?? [];
+        final firstImage = images.isNotEmpty ? images.first : null;
         return ListTile(
-          leading: Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 22.sp),
-          title: Text(folder, style: GoogleFonts.outfit(
-            color: Colors.black87, fontSize: 14.sp,
-          )),
+          contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+          leading: Container(
+            width: 40.w, height: 40.w,
+            decoration: BoxDecoration(
+              color: const Color(0xFF008080).withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: firstImage != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: firstImage['isAsset'] == 'true'
+                        ? Image.asset(firstImage['image']!, fit: BoxFit.cover)
+                        : Image.network(firstImage['image']!, fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 20.sp)),
+                  )
+                : Icon(Icons.folder_rounded, color: const Color(0xFF008080), size: 20.sp),
+          ),
+          title: Text(
+            folder[0].toUpperCase() + folder.substring(1),
+            style: GoogleFonts.outfit(color: Colors.black87, fontSize: 14.sp, fontWeight: FontWeight.w500),
+          ),
+          trailing: Icon(Icons.north_west_rounded, color: Colors.black26, size: 16.sp),
           onTap: () {
             query = folder;
             showResults(context);

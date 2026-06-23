@@ -104,12 +104,19 @@ class _CategoryGridViewState extends State<CategoryGridView> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            CachedImage(
-                              project['image']!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  Container(color: Colors.grey[800]),
-                            ),
+                            project['isAsset'] == 'true'
+                                ? Image.asset(
+                                    project['image']!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  )
+                                : CachedImage(
+                                    project['image']!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        Container(color: Colors.grey[800]),
+                                  ),
                             Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(

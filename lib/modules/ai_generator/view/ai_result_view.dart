@@ -151,7 +151,6 @@ class AIResultView extends GetView<AIGeneratorViewModel> {
         CustomButton(
           text: 'ADD TO TEMPLATES',
           onPressed: () {
-            // Get the templates view model and add the logo
             try {
               final templatesVM = Get.find<TemplatesViewModel>();
               templatesVM.addLogoToTemplates(

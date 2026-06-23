@@ -11,6 +11,7 @@ import 'firebase_options.dart';
 import 'modules/profile/view_model/profile_view_model.dart';
 import 'app/services/purchase_service.dart';
 import 'app/services/cache_service.dart';
+import 'app/services/image_cache_db.dart';
 import 'app/data/subscription_data.dart';
 
 void main() async {
@@ -40,6 +41,8 @@ void main() async {
     Get.put(PurchaseService(), permanent: true);
     // Initialize image cache (SQLite)
     await CacheService.instance.init();
+    // Initialize image URL cache DB (SQLite)
+    await ImageCacheDb.instance.init();
   } catch (e) {
     print('FIREBASE INITIALIZATION ERROR: $e');
   }
@@ -59,7 +62,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          title: 'The Ethereal Studio',
+          title: 'Logo Maker',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,

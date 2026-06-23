@@ -632,7 +632,7 @@ class EditorViewModel extends GetxController {
     } catch (e) {
       Get.snackbar('Error', e.toString());
     } finally {
-      isLoading.value = false;
+        isLoading.value = false;
     }
   }
 

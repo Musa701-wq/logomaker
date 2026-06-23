@@ -175,7 +175,7 @@ class EditorView extends GetView<EditorViewModel> {
                     end: Alignment.bottomRight,
                   ).createShader(bounds),
                   child: Text(
-                    'Luminous Atelier',
+                    'Logo Maker',
                     style: GoogleFonts.outfit(
                       color: Colors.white,
                       fontSize: 18.sp,
@@ -854,10 +854,13 @@ class EditorView extends GetView<EditorViewModel> {
                           color: isSel ? const Color(0xFF008080) : Colors.transparent,
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        child: FittedBox(fit: BoxFit.scaleDown, child: Text(cat, style: GoogleFonts.outfit(
-                          color: isSel ? Colors.black : Colors.black38,
-                          fontWeight: FontWeight.bold, fontSize: 9.sp,
-                        ))),
+                        child: FittedBox(fit: BoxFit.scaleDown, child: Text(
+                          cat.toUpperCase().replaceAll('_', ' '),
+                          style: GoogleFonts.outfit(
+                            color: isSel ? Colors.black : Colors.black38,
+                            fontWeight: FontWeight.bold, fontSize: 9.sp,
+                          ),
+                        )),
                       ),
                     );
                   }).toList()),
@@ -1109,7 +1112,7 @@ class EditorView extends GetView<EditorViewModel> {
       final bgTab = controller.bgTab.value;
       return _panelPad(Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       _phdr('Background'),
-      Text('Select the atmosphere for your atelier', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp)),
+      Text('Select the background for your design', style: GoogleFonts.outfit(color: Colors.black38, fontSize: 12.sp)),
       _sp(14),
       // Tabs: ABSTRACT | SOLID | BLURY | VINTAGE
       Container(
@@ -1552,68 +1555,116 @@ class EditorView extends GetView<EditorViewModel> {
     final element = controller.components[index];
     final textController = TextEditingController(text: element.content);
 
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        title: Text(
-          'Edit Text',
-          style: GoogleFonts.outfit(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+    Get.bottomSheet(
+      Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(Get.context!).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 28.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Edit Text',
+                style: GoogleFonts.outfit(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              TextField(
+                controller: textController,
+                autofocus: true,
+                maxLines: 3,
+                minLines: 1,
+                cursorColor: const Color(0xFF008080),
+                style: GoogleFonts.outfit(fontSize: 14.sp, color: Colors.black87),
+                decoration: InputDecoration(
+                  hintText: 'Enter text...',
+                  hintStyle: GoogleFonts.outfit(color: Colors.black38),
+                  filled: true,
+                  fillColor: const Color(0xFFF4F4F8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(color: Color(0xFF008080), width: 1.5),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                      ),
+                      child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.black54, fontSize: 14.sp)),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final newText = textController.text.trim();
+                        if (newText.isNotEmpty) {
+                          controller.updateSelectedElement((e) => e.copyWith(content: newText));
+                        }
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF008080),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        elevation: 0,
+                      ),
+                      child: Text('Apply', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        content: TextField(
-          controller: textController,
-          autofocus: true,
-          maxLines: 3,
-          minLines: 1,
-          cursorColor: const Color(0xFF008080),
-          style: GoogleFonts.outfit(fontSize: 14.sp, color: Colors.black87),
-          decoration: InputDecoration(
-            hintText: 'Enter text...',
-            hintStyle: GoogleFonts.outfit(color: Colors.black38),
-            filled: true,
-            fillColor: const Color(0xFFF4F4F8),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Color(0xFF008080), width: 1.5),
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.outfit(color: Colors.black38, fontSize: 13.sp),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newText = textController.text.trim();
-              if (newText.isNotEmpty) {
-                controller.updateSelectedElement((e) => e.copyWith(content: newText));
-              }
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF008080),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-            ),
-            child: Text('OK', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13.sp)),
-          ),
-        ],
       ),
-      barrierDismissible: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.3),
     );
   }
 

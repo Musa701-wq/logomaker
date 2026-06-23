@@ -77,7 +77,7 @@ class PersonalInformationView extends GetView<ProfileViewModel> {
             SizedBox(height: 40.h),
             
             Text(
-              'Your personal data is synced with your Google account for a seamless experience across all Atelier Studio platforms.',
+              'Your personal data is synced with your Google account for a seamless experience across all Logo Maker platforms.',
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
                 fontSize: 12.sp,

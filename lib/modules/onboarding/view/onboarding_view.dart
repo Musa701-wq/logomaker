@@ -42,7 +42,7 @@ class OnboardingView extends GetView<OnboardingViewModel> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'ATELIER',
+                        'LOGO MAKER',
                         style: GoogleFonts.outfit(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w800,

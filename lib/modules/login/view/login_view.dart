@@ -31,18 +31,12 @@ class LoginView extends GetView<LoginViewModel> {
                   children: [
                     SizedBox(height: 40.h),
                     Text(
-                      'Atelier',
-                      style: GoogleFonts.dancingScript(
-                        fontSize: 64.sp,
-                        fontWeight: FontWeight.bold,
+                      'Logo Maker',
+                      style: GoogleFonts.outfit(
+                        fontSize: 36.sp,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.4),
-                            offset: const Offset(0, 4),
-                            blurRadius: 15,
-                          ),
-                        ],
+                        letterSpacing: 1,
                       ),
                     ),
                     SizedBox(height: 8.h),

@@ -12,4 +12,5 @@ class AppRoutes {
   static const String welcomeBanner = '/welcome-banner';
   static const String howToUse = '/how-to-use';
   static const String rateUs = '/rate-us';
+  static const String customerSupport = '/customer-support';
 }
