@@ -19,7 +19,6 @@ class PurchaseService extends GetxService {
   final RxMap<String, ProductDetails> productDetails = <String, ProductDetails>{}.obs;
   final RxBool isLoadingProducts = false.obs;
   final RxBool isPurchasing = false.obs;
-
   StreamSubscription<List<PurchaseDetails>>? _subscription;
 
   @override
@@ -42,6 +41,11 @@ class PurchaseService extends GetxService {
     }
 
     await _restoreSubscriptionStatus();
+
+    // auto-restore on every app start to check purchase from store
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (isAvailable.value) _inAppPurchase.restorePurchases();
+    });
   }
 
   void _loadFallbackProducts() {
@@ -137,6 +141,8 @@ class PurchaseService extends GetxService {
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased) {
         _handlePurchase(purchase);
+      } else if (purchase.status == PurchaseStatus.restored) {
+        _handleRestore(purchase);
       } else if (purchase.status == PurchaseStatus.error) {
         debugPrint('Purchase error: ${purchase.error}');
         isPurchasing.value = false;
@@ -161,6 +167,24 @@ class PurchaseService extends GetxService {
       debugPrint('Error completing purchase: $e');
     }
     isPurchasing.value = false;
+  }
+
+  void _handleRestore(PurchaseDetails purchase) {
+    final plan = SubscriptionData.to.getByProductId(purchase.productID);
+    if (plan == null) return;
+
+    // always active on restore (store only returns active subscriptions)
+    final fromDate = _parseDate(purchase.transactionDate) ?? DateTime.now();
+    final expiry = fromDate.add(SubscriptionData.to.periodForPlan(plan.id));
+
+    if (expiry.isAfter(DateTime.now())) {
+      _activateSubscription(plan.id, expiry);
+    }
+  }
+
+  DateTime? _parseDate(String? iso) {
+    if (iso == null) return null;
+    return DateTime.tryParse(iso);
   }
 
   Future<void> _activateSubscription(String planId, DateTime expiry) async {
